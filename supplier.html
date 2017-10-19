@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <title></title>
+    <meta name="viewport" content="width=device-width, initial-scale=1,maximum-scale=1,user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <!--标准mui.css-->
+    <link rel="stylesheet" href="../css/mui.min.css">
+    <!--App自定义的css-->
+    <link rel="stylesheet" href="../css/mui.indexedlist.css">
+    <link rel="stylesheet" href="../css/bass.css">
+    <style>
+        html,
+        body {
+            height: 100%;
+            overflow: hidden;
+        }
+        .mui-bar {
+            -webkit-box-shadow: none;
+            box-shadow: none;
+        }
+    </style>
+</head>
+<body class="supplierMain">
+<!--顶部标题栏 开始-->
+<header class="mui-bar mui-bar-nav">
+    <a class="mui-action-back mui-icon mui-icon-left-nav mui-pull-left"></a>
+    <h1 class="mui-title">供应商管理</h1>
+</header>
+<!--顶部标题栏 线束-->
+<!--中间内容区 开始-->
+<div class="mui-content">
+    <div id='list' class="mui-indexed-list" style="margin-top: -2px">
+        <div class="mui-indexed-list-search mui-input-row mui-search">
+            <!--<input type="search" class="mui-input-clear mui-indexed-list-search-input" placeholder="搜索供应商">-->
+        </div>
+        <div class="mui-indexed-list-bar">
+            <a>#</a>
+            <a>A</a>
+            <a>B</a>
+            <a>C</a>
+            <a>D</a>
+            <a>E</a>
+            <a>F</a>
+            <a>G</a>
+            <a>H</a>
+            <a>I</a>
+            <a>J</a>
+            <a>K</a>
+            <a>L</a>
+            <a>M</a>
+            <a>N</a>
+            <a>O</a>
+            <a>P</a>
+            <a>Q</a>
+            <a>R</a>
+            <a>S</a>
+            <a>T</a>
+            <a>U</a>
+            <a>V</a>
+            <a>W</a>
+            <a>X</a>
+            <a>Y</a>
+            <a>Z</a>
+        </div>
+        <div class="mui-indexed-list-alert"></div>
+        <div class="mui-indexed-list-inner">
+            <div class="mui-indexed-list-empty-alert">没有数据</div>
+            <ul class="mui-table-view" id="list_body">
+                
+                
+            </ul>
+        </div>
+        <div class="footer_btn" id="footer_btn">
+            <a class="mui-btn mui-btn-primary mui-btn-block wxm_a" href="javascript:;" data-href="supplierAdd.html">添加一个新的供应商</a>
+        </div>
+    </div>
+</div>
+<!--中间内容区 结束-->
+</body>
+<script src="../js/mui.min.js"></script>
+<script src="../js/mui.indexedlist.js"></script>
+<script src="../js/master.js"></script>
+<script src="../js/ext.js"></script>
+<script src="../js/pinying.js"></script>
+<script>
+    mui.plusReady(function() {
+        var header = document.querySelector('header.mui-bar');
+        var list = document.getElementById('list');
+        var footer_btn = document.getElementById('footer_btn');
+        //calc hieght
+        list.style.height = (document.body.offsetHeight - header.offsetHeight -footer_btn.offsetHeight) + 'px';
+        
+        reload();
+    });
+    
+    function reload() {
+    	
+        async("GET", "/provider/my-provider", {}, function (res) {
+        	document.getElementById("list_body").innerHTML = "";
+        	if (res.data && res.data.length > 0) {
+        		var all = {};
+        		for (var i = 0; i < res.data.length; i++) {
+        			var item = res.data[i];
+        			var py = makePy(item.name)[0];
+        			var cap = py.substring(0, 1).toUpperCase();
+        			if (cap >= 'A' && cap <= 'Z') {
+        				
+        			} else {
+        				cap = '#';
+        			}
+        			
+        			if (!all.hasOwnProperty(cap)) {
+        				all[cap] = [];
+        			}
+        			
+        			all[cap].push(item); 
+        		}
+        		/*
+        		 <li data-group="A" class="mui-table-view-divider mui-indexed-list-group">A</li>
+                <li data-value="" data-tags="" class="mui-table-view-cell mui-indexed-list-item mui-row mui-disabled">
+                    <div class="mui-col-sm-8 mui-col-xs-8"><a href="supplierDetails.html" class="wxm_a">
+                        <h5>供货商姓名：张三</h5>
+                        <p>公司名称：华采科技</p>
+                    </a></div>
+                    <div class="mui-col-sm-4 mui-col-xs-4 mui-text-right">
+                        <p>18311788821</p>
+                        <a href="tel:18311788821" class="tel">联系他</a>
+                    </div>
+                </li>
+        		 */
+        		var ul = document.getElementById("list_body");
+        		for (var i = 0; i < 27; i++) {
+        			var cap = i == 0 ? "#" : String.fromCharCode(64+i);
+        			if (all.hasOwnProperty(cap)) {
+        				var index = document.createElement("li");
+        				index.setAttribute("data-group", cap);
+        				index.className = "mui-table-view-divider mui-indexed-list-group";
+        				index.textContent = cap;
+        				ul.appendChild(index);
+        				
+        				
+        				for (var j = 0; j < all[cap].length; j++) {
+        					var item = all[cap][j];
+        					
+	        				var li = document.createElement("li");
+		    				li.className = "mui-table-view-cell mui-indexed-list-item mui-row mui-disabled";
+		    				ul.appendChild(li);
+		    				
+        					var left = document.createElement("div");
+        					left.className = "mui-col-sm-8 mui-col-xs-8";
+        					li.appendChild(left);
+        					
+        					var a = document.createElement("a");
+        					a.className = "wxm_a";
+        					left.appendChild(a);
+        					a.setAttribute("href", "javascript:;");
+        					a.setAttribute("data-href", "supplierDetails.html?sid=" + item.id);
+        					a.addEventListener("tap", linkForward);
+        					
+        					var name = document.createElement("h5");
+        					name.textContent = "供货商姓名：" + item.name;
+        					a.appendChild(name);
+        					
+        					var comp = document.createElement("p");
+        					comp.textContent = "公司名称：" + item.providerName;
+        					a.appendChild(comp);
+        					
+        					var right = document.createElement("div");
+        					right.className = "mui-col-sm-4 mui-col-xs-4 mui-text-right";
+        					li.appendChild(right);
+        					
+        					var mobile = document.createElement("p");
+        					mobile.textContent = item.tel;
+        					right.appendChild(mobile);
+        					
+        					var tel = document.createElement("a");
+        					tel.textContent = "联系他";
+        					tel.className = "tel";
+        					tel.setAttribute("href", "tel:" + item.tel);
+        					right.appendChild(tel);
+        				}
+        			}
+        		}
+		        //create
+		        window.indexedList = new mui.IndexedList(list);
+        	}
+        });
+    }
+</script>
+</html>

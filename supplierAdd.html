@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <title></title>
+    <meta name="viewport" content="width=device-width, initial-scale=1,maximum-scale=1,user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <!--标准mui.css-->
+    <link rel="stylesheet" href="../css/mui.min.css">
+    <!--App自定义的css-->
+    <link rel="stylesheet" href="../css/bass.css">
+</head>
+<body class="goodsEditMain">
+<!--顶部标题栏 开始-->
+<header class="mui-bar mui-bar-nav">
+    <a class="mui-action-back mui-icon mui-icon-left-nav mui-pull-left"></a>
+    <h1 class="mui-title">添加供应商</h1>
+</header>
+<!--顶部标题栏 线束-->
+<!--中间内容区 开始-->
+<div class="mui-content" style="margin-bottom: 70px">
+    <form class="mui-input-group">
+        <ul class="mui-table-view">
+            <li class="mui-table-view-cell mui-disabled">
+                <label>供应商姓名</label>
+                <input type="text" class="mui-input mui-input-clear w65" id="s_name" placeholder="请输入供货商姓名">
+            </li>
+            <li class="mui-table-view-cell mui-disabled">
+                <label>联系方式</label>
+                <input type="text" class="mui-input mui-input-clear w65" id="s_tel" placeholder="请输入供货商联系方式">
+            </li>
+            <li class="mui-table-view-cell mui-disabled">
+                <label>微信号码</label>
+                <input type="text" class="mui-input mui-input-clear w65" id="s_wx" placeholder="请输入微信号码，可不填">
+            </li>
+            <li class="mui-table-view-cell mui-disabled">
+                <label>公司名称</label>
+                <input type="text" class="mui-input mui-input-clear w65" id="s_comp" placeholder="请输入公司名称">
+            </li>
+            <li class="mui-table-view-cell mui-disabled">
+                <label>货源地</label>
+                <input type="text" class="mui-input mui-input-clear w65" id="s_addr" placeholder="请输入货源地">
+            </li>
+            <li class="mui-table-view-cell mui-disabled">
+                文字说明
+                <textarea id="s_remark" rows="3" placeholder="请描述下供应商情况，可不填"></textarea>
+            </li>
+        </ul>
+    </form>
+    <div class="mui-content-padded login-tips" id="input_error" style="display: none;">
+        <span class="mui-icon mui-icon-close"></span><span id="error_text"></span>
+    </div>
+    <div class="footer_btn mui-text-center">
+        <button class="mui-btn mui-btn-block mui-btn-grey" disabled="disabled" id="s_btn">确认添加</button>
+    </div>
+</div>
+<!--中间内容区 结束-->
+</body>
+<script src="../js/mui.min.js"></script>
+<script src="../js/master.js"></script>
+<script src="../js/ext.js"></script>
+<script>
+	mui.plusReady(function () {
+		
+		document.getElementById("s_name").addEventListener("keyup", checker);
+		document.getElementById("s_tel").addEventListener("keyup", checker);
+		document.getElementById("s_addr").addEventListener("keyup", checker);
+		document.getElementById("s_comp").addEventListener("keyup", checker);
+		
+		document.getElementById("s_btn").addEventListener("tap", function () {
+			var s_name = document.getElementById("s_name").value.trim();
+			var s_tel = document.getElementById("s_tel").value.trim();
+			var s_addr = document.getElementById("s_addr").value.trim();
+			var s_comp = document.getElementById("s_comp").value.trim();
+			var s_wx = document.getElementById("s_wx").value.trim();
+			var s_remark = document.getElementById("s_remark").value.trim();
+			
+			if (s_name != "" && s_tel != "" && s_addr != "" && s_comp != "") {
+				document.getElementById("input_error").style.display = "none";
+				if (!/^[0-9]{11}$/.test(s_tel)) {
+					document.getElementById("input_error").style.display = "block";
+					document.getElementById("error_text").innerText = "请输入正确的手机号";
+					return false;
+				}
+				
+				async("POST", "/provider/addProvider", {
+					name:s_name,
+					tel:s_tel,
+					providerName:s_comp,
+					addressDetail:s_addr,
+					weixinName:s_wx,
+					remark:s_remark
+				}, function (res) {
+					mui.toast("操作成功");
+					plus.webview.currentWebview().opener().evalJS("reload()");
+					mui.back();
+				}, function (res) {
+					document.getElementById("input_error").style.display = "block";
+					document.getElementById("error_text").innerText = res.msg;
+				});
+			}
+			
+		});
+	});
+	function checker() {
+		var s_name = document.getElementById("s_name").value.trim();
+		var s_tel = document.getElementById("s_tel").value.trim();
+		var s_addr = document.getElementById("s_addr").value.trim();
+		var s_comp = document.getElementById("s_comp").value.trim();
+		var s_btn = document.getElementById("s_btn");
+		if (s_name == "" || s_tel == "" || s_addr == "" || s_comp == "") {
+			s_btn.classList.remove("mui-btn-primary");
+			s_btn.classList.add("mui-btn-grey");
+			s_btn.setAttribute("disabled", true);
+		} else {
+			s_btn.classList.add("mui-btn-primary");
+			s_btn.classList.remove("mui-btn-grey");
+			s_btn.removeAttribute("disabled");
+		}
+	}
+</script>
+</html>

@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html>
+
+	<head>
+	    <meta charset="utf-8">
+	    <title></title>
+	    <meta name="viewport" content="width=device-width, initial-scale=1,maximum-scale=1,user-scalable=no">
+	    <meta name="apple-mobile-web-app-capable" content="yes">
+	    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+	    <!--标准mui.css-->
+	    <link rel="stylesheet" href="../css/mui.min.css">
+	    <!--App自定义的css-->
+	    <link rel="stylesheet" href="../css/mui.picker.css">
+	    <link rel="stylesheet" href="../css/mui.poppicker.css">
+	    <link rel="stylesheet" href="../css/bass.css">
+	</head>
+
+	<body class="newsMain">
+		<!--下拉刷新容器-->
+		<div class="container mui-content mui-scroll-wrapper" id="pullrefresh">
+			<div class="mui-scroll">
+				<div id="news_list">
+					
+				</div>
+			</div>
+		</div>
+		<script src="../js/mui.min.js"></script>
+		<script src="../js/master.js"></script>
+		<script src="../js/ext.js"></script>
+		<script>
+			
+			var page = 0;
+			/**
+			 * 下拉刷新具体业务实现
+			 */
+			function pulldownRefresh() {
+				loadData(false);
+			}
+			
+			function loadData(more) {
+				var pageParam = more?page+1:1;
+				async("GET", "/informationPush/informationPushs?pageNum=" + pageParam + "&pageSize=10", {}, function (res) {
+					page = pageParam;
+					
+					var news_list = document.getElementById("news_list");
+					
+					if (!more) {
+						news_list.innerHTML = "";
+					}
+					
+					if (res.data && res.data.dataList && res.data.dataList.length > 0 && page <= res.data.totalPage) {
+						
+						/*
+						<div class="mui-card">
+							<div class="mui-card-header" style="background: #666; color: #fff; font-size: 14px">
+								<div class="mui-pull-left">采货通知</div>
+								<div class="mui-pull-right">2017-07-06</div>
+							</div>
+							<div class="mui-card-content">
+								<div class="mui-card-content-inner">
+									舟山市菜市场王老五家新到一批鱿鱼，请 <a href="" id='toastBtn'>采货 ></a>
+								</div>
+							</div>
+						</div>
+						 */
+						
+						for (var i = 0; i < res.data.dataList.length; i++) {
+							var item = res.data.dataList[i];
+							var card = document.createElement("div");
+							card.className = "mui-card";
+							news_list.appendChild(card);
+							
+							card.setAttribute("data-type", item.type);
+							card.setAttribute("data-gid", item.commodityId);
+							card.setAttribute("data-oid", item.orderId);
+							card.setAttribute("data-id", item.id);
+							card.setAttribute("data-salespersonName", item.salespersonName);
+							
+							var header = document.createElement("div");
+							header.className = "mui-card-header";
+							
+							card.appendChild(header);
+							
+							var left = document.createElement("div");
+							left.className = "mui-pull-left";
+							header.appendChild(left);
+							if (item.type == 1) {
+								header.setAttribute("style", "background: #666; color: #fff; font-size: 14px;");
+								left.textContent = "采货通知";
+							} else if (item.type == 2) {
+								header.setAttribute("style", "background: #e3e3e3; color: #000; font-size: 14px;");
+								left.textContent = "订单通知";
+							} else if (item.type == 3) {
+								header.setAttribute("style", "background: #666; color: #fff; font-size: 14px;");
+								left.textContent = "组员分享货源";
+							}
+							
+							var right = document.createElement("div");
+							right.className = "mui-pull-right";
+							header.appendChild(right);
+							right.textContent = item.createTime.substring(0, 10);
+							
+							var content = document.createElement("div");
+							content.className = "mui-card-content";
+							card.appendChild(content);
+							
+							var inner = document.createElement("div");
+							inner.className = "mui-card-content-inner";
+							content.appendChild(inner);
+							inner.textContent = item.content;
+							
+							card.addEventListener("tap", function () {
+								var type = this.getAttribute("data-type");
+								var oid = this.getAttribute("data-oid");
+								var gid = this.getAttribute("data-gid");
+								var id = this.getAttribute("data-id");
+								var salespersonName = this.getAttribute("data-salespersonName");
+								
+								async("GET", "/informationPush/editStatus?id=" + id, {}, function () {
+								
+									if (type == 1) {
+										
+										mui.openWindow({
+											url: "goodsAdd.html",
+											id: "goodsAdd"
+										});
+									} else if (type == 2) {
+										
+										mui.openWindow({
+											url: "orderDetail.html",
+											id: "orderDetail",
+											extras: {
+												oid:oid
+											}
+										});
+									} else if (type == 3) {
+										
+										mui.openWindow({
+											url: "goodsDetail.html",
+											id: "goodsDetail",
+											extras: {
+												gid:gid,
+												status:99,
+												salespersonName:salespersonName
+											}
+										});
+									}
+								});
+							});
+						}
+						
+						
+						if (more) {						
+							mui('#pullrefresh').pullRefresh().endPullupToRefresh(false);
+						} else {
+							mui('#pullrefresh').pullRefresh().endPulldownToRefresh();
+							mui('#pullrefresh').pullRefresh().refresh(true);
+						}
+						
+					} else {
+						if (more) {						
+							mui('#pullrefresh').pullRefresh().endPullupToRefresh(true);
+						} else {
+							document.getElementById("news_list").innerHTML = "";
+							mui('#pullrefresh').pullRefresh().endPulldownToRefresh();		
+						}
+					}
+					
+								
+				}, function () {
+					if (more) {						
+						mui('#pullrefresh').pullRefresh().endPullupToRefresh(true);
+					} else {
+						document.getElementById("news_list").innerHTML = "";
+						mui('#pullrefresh').pullRefresh().endPulldownToRefresh();		
+					}
+				}, true);
+			}
+			
+			/**
+			 * 上拉加载具体业务实现
+			 */
+			function pullupRefresh() {
+				loadData(true);
+			}
+			
+				
+			mui.init({
+				pullRefresh: {
+					container: '#pullrefresh',
+					down: {
+						callback: pulldownRefresh
+					},
+					up: {
+						contentrefresh: '正在加载...',
+						callback: pullupRefresh,
+						auto:true
+					}
+				}
+			});
+		
+		</script>
+	</body>
+
+</html>

@@ -1,0 +1,1292 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <title></title>
+    <meta name="viewport" content="width=device-width, initial-scale=1,maximum-scale=1,user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <!--标准mui.css-->
+    <link rel="stylesheet" href="../css/mui.min.css">
+    <!--App自定义的css-->
+    <link rel="stylesheet" href="../css/mui.picker.css">
+    <link rel="stylesheet" href="../css/mui.poppicker.css">
+    <link rel="stylesheet" href="../css/bass.css">
+    <style>
+    	.goodsEditMain .mui-table-view.mui_lianxiang {z-index:2; position: absolute; top: 40px;}
+        i {
+            font-style: normal;
+        }
+        ul#ul_imgs {
+            list-style: none;
+            padding: 0;
+            overflow: auto;
+        }
+        ul#ul_imgs li {
+            float: left;
+            width: 20%;
+        }
+        .img-father {
+            position: relative;
+            padding: 5px;
+        }
+        .img-father .img-container {
+            width: 100%;
+        }
+        .img-father .img-container img {
+            width: 100%;
+            height: 100%;
+            vertical-align: middle;
+            object-fit: cover;
+            /*border-top-left-radius: 3px;
+            border-top-right-radius: 3px;*/
+
+            border-radius: 3px;
+        }
+        .img-father .img-content {
+            background-color: #F5F5F5;
+            box-shadow: 1px 0 1px #CCCCCC, -1px 0 1px #CCCCCC;
+            z-index: 10;
+            text-indent: 2px;
+            height: 21px;
+            line-height: 21px;
+            overflow: hidden;
+            border-bottom-left-radius: 3px;
+            border-bottom-right-radius: 3px;
+        }
+        .img-father .img-remove {
+            display: none;
+            position: absolute;
+            top: 4px;
+            right: 4px;
+            color: white;
+            background: #101010;
+            border-radius: 50%;
+            font-size: 14px;
+            border: 1px solid white;
+            font-weight: 1000;
+            height: 16px;
+            width: 16px;
+            line-height: 14px;
+            text-align: center;
+        }
+        .shake {
+            -webkit-transform-origin: center center;
+            -webkit-animation-name: shake-rotate;
+            -webkit-animation-duration: 0.5s;
+            -webkit-animation-timing-function: linear;
+            -webkit-animation-iteration-count: infinite;
+        }
+        .shakecontainer .img-container img {
+            border: 1px solid #CCCCCC;
+            border-radius: 6px;
+        }
+        .shakecontainer .img-content {
+            display: none;
+        }
+        .shakecontainer .img-remove {
+            display: block;
+        }
+        ul#ul_imgs li[draggable=true] {
+            transform: scale(1.2);
+            -webkit-transform: scale(1.2);
+        }
+        ul#ul_imgs li[draggable=true]>div {
+            -webkit-animation-name: none;
+        }
+        ul#ul_imgs li[draggable=true] .img-remove {
+            display: none;
+        }
+        .sort-handle {
+            cursor: move;
+            cursor: -webkit-grabbing;
+        }
+        .sort-ghost {
+            opacity: 0;
+        }
+        .sort-chosen {
+            transform: scale(1.2);
+            -webkit-transform: scale(1.2);
+            transition: transform .3s;
+            -webkit-transition: transform .3s;
+        }
+        .sort-chosen:last-child {
+            transition: none;
+            -webkit-transition: none;
+        }
+        @-webkit-keyframes shake-rotate {
+            0% {
+                -webkit-transform: rotate(0deg);
+            }
+            12.5% {
+                -webkit-transform: rotate(1.25deg);
+            }
+            25% {
+                -webkit-transform: rotate(2.5deg);
+            }
+            37.5% {
+                -webkit-transform: rotate(1.25deg);
+            }
+            50% {
+                -webkit-transform: rotate(0deg);
+            }
+            62.5% {
+                -webkit-transform: rotate(-1.25deg);
+            }
+            75% {
+                -webkit-transform: rotate(-2.5deg);
+            }
+            87.5% {
+                -webkit-transform: rotate(-1.25deg);
+            }
+            100% {
+                -webkit-transform: rotate(0deg);
+            }
+        }
+        .mui-preview-image.mui-fullscreen {
+            position: fixed;
+            z-index: 999;
+            background-color: #000;
+        }
+        .mui-preview-header,
+        .mui-preview-footer {
+            position: absolute;
+            width: 100%;
+            left: 0;
+            z-index: 10;
+        }
+        .mui-preview-header {
+            height: 44px;
+            top: 0;
+        }
+        .mui-preview-footer {
+            height: 50px;
+            bottom: 0px;
+        }
+        .mui-preview-header .mui-preview-indicator {
+            display: block;
+            line-height: 25px;
+            color: #fff;
+            text-align: center;
+            margin: 15px auto 4px;
+            width: 70px;
+            background-color: rgba(0, 0, 0, 0.4);
+            border-radius: 12px;
+            font-size: 16px;
+        }
+        .mui-preview-image {
+            display: none;
+            -webkit-animation-duration: 0.5s;
+            animation-duration: 0.5s;
+            -webkit-animation-fill-mode: both;
+            animation-fill-mode: both;
+        }
+        .mui-preview-image.mui-preview-in {
+            -webkit-animation-name: fadeIn;
+            animation-name: fadeIn;
+        }
+        .mui-preview-image.mui-preview-out {
+            background: none;
+            -webkit-animation-name: fadeOut;
+            animation-name: fadeOut;
+        }
+        .mui-preview-image.mui-preview-out .mui-preview-header,
+        .mui-preview-image.mui-preview-out .mui-preview-footer {
+            display: none;
+        }
+        .mui-zoom-scroller {
+            position: absolute;
+            display: -webkit-box;
+            display: -webkit-flex;
+            display: flex;
+            -webkit-box-align: center;
+            -webkit-align-items: center;
+            align-items: center;
+            -webkit-box-pack: center;
+            -webkit-justify-content: center;
+            justify-content: center;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            margin: 0;
+            -webkit-backface-visibility: hidden;
+        }
+        .mui-zoom {
+            -webkit-transform-style: preserve-3d;
+            transform-style: preserve-3d;
+        }
+        .mui-slider .mui-slider-group .mui-slider-item img {
+            width: auto;
+            height: auto;
+            max-width: 100%;
+            max-height: 100%;
+        }
+        .mui-android-4-1 .mui-slider .mui-slider-group .mui-slider-item img {
+            width: 100%;
+        }
+        .mui-android-4-1 .mui-slider.mui-preview-image .mui-slider-group .mui-slider-item {
+            display: inline-table;
+        }
+        .mui-android-4-1 .mui-slider.mui-preview-image .mui-zoom-scroller img {
+            display: table-cell;
+            vertical-align: middle;
+        }
+        .mui-preview-loading {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            display: none;
+        }
+        .mui-preview-loading.mui-active {
+            display: block;
+        }
+        .mui-preview-loading .mui-spinner-white {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            margin-left: -25px;
+            margin-top: -25px;
+            height: 50px;
+            width: 50px;
+        }
+        .mui-preview-image img.mui-transitioning {
+            -webkit-transition: -webkit-transform 0.5s ease, opacity 0.5s ease;
+            transition: transform 0.5s ease, opacity 0.5s ease;
+        }
+        @-webkit-keyframes fadeIn {
+            0% {
+                opacity: 0;
+            }
+            100% {
+                opacity: 1;
+            }
+        }
+        @keyframes fadeIn {
+            0% {
+                opacity: 0;
+            }
+            100% {
+                opacity: 1;
+            }
+        }
+        @-webkit-keyframes fadeOut {
+            0% {
+                opacity: 1;
+            }
+            100% {
+                opacity: 0;
+            }
+        }
+        @keyframes fadeOut {
+            0% {
+                opacity: 1;
+            }
+            100% {
+                opacity: 0;
+            }
+        }
+        p img {
+            max-width: 100%;
+            height: auto;
+        }
+        .mui-slider-img-content {
+            position: absolute;
+            bottom: 10px;
+            left: 10px;
+            right: 10px;
+            color: white;
+            text-align: center;
+            line-height: 21px
+        }
+    </style>
+</head>
+<body class="goodsEditMain">
+<!--顶部标题栏 开始-->
+<header class="mui-bar mui-bar-nav">
+    <a class="mui-action-back mui-icon mui-icon-left-nav mui-pull-left"></a>
+    <h1 class="mui-title" id="title_label">添加货源</h1>
+</header> 
+<!--顶部标题栏 线束-->
+<!--中间内容区 开始-->
+<div class="mui-content" style="margin-bottom: 70px">
+	<input type="hidden" id="commodityId" value="" />
+    <form class="mui-input-group">
+        <!--不可输入项添加遮罩 class名为mui-disabled_layer-->
+        <ul class="mui-table-view">
+            <li class="mui-table-view-cell mui-disabled"><div >
+                <label>供应商联系方式</label>
+                <input type="text" class="mui-input mui-input-clear mui-text-right w65" id="sup_phone" placeholder="请输入电话号码">
+            </div></li>
+            <li class="mui-table-view-cell mui-disabled"><div class="mui-navigate-right">
+                商品一级分类
+                <span class="mui-pull-right" id="levelPicker1">请选择</span>
+            </div></li>
+            <li class="mui-table-view-cell mui-disabled"><div class="mui-navigate-right">
+                商品二级分类
+                <span class="mui-pull-right" id="levelPicker2">请选择</span>
+            </div></li>
+            <li class="mui-table-view-cell mui-disabled"><div>
+                商品名称
+                <input type="text" class="mui-input mui-input-clear mui-text-right w65" id="goods_name" placeholder="请输入商品名称">
+            </div></li>
+            <li class="mui-table-view-cell mui-disabled"><div class="mui-navigate-right">
+                商品规格
+                <span class="mui-pull-right" id="goodsType">请选择</span>
+            </div></li>
+            <li class="mui-table-view-cell mui-disabled"><div class="">
+                <label>当前报价</label>
+                <input type="number" step="0.01" class="mui-input mui-input-clear w50" id="goods_price" placeholder="0.00">
+                <span class="mui-pull-right">元/吨</span>
+            </div></li>
+            <li class="mui-table-view-cell mui-disabled"><div class="">
+                <label>当前库存</label>
+                <input type="number" class="mui-input mui-input-clear w50" id="goods_remain" placeholder="0.00">
+                <span class="mui-pull-right">吨</span>
+            </div></li>
+            <li class="mui-table-view-cell mui-disabled"><div>
+                货源地
+                <input type="text" class="mui-input mui-input-clear mui-text-right w65" id="goods_source" placeholder="请输入货源地">
+            </div></li>
+            <li class="mui-table-view-cell mui-disabled"><div class="">
+                <label>件重</label>
+                <input type="number" step="0.01" class="mui-input mui-input-clear w50" id="goods_weight" placeholder="0.00">
+                <span class="mui-pull-right">Kg/件</span>
+            </div></li>
+            <li class="mui-table-view-cell mui-disabled"><div class="mui-navigate-right">
+                捕捞方式
+                <span class="mui-pull-right" id="modePicker">请选择</span>
+            </div></li>
+            <li class="mui-table-view-cell mui-disabled"><div class="">
+                <textarea id="goods_summary" rows="3" placeholder="请输入详细文字说明"></textarea>
+            </div></li>
+            <li class="mui-table-view-cell mui-disabled"><div class="mui-navigate-right">
+                上传照片
+                <span class="mui-pull-right mui-icon mui-icon-image upload-btn"><input type="file" accept="image/*" style="" multiple></span>
+            </div></li>
+            <li class="mui-table-view-cell mui-disabled">
+                <ul class="mui-row5 mui-clearfix" id="ul_imgs">
+                    <div class="mui_add" id="img_add"><div class="mui-icon mui-icon-plusempty upload-btn" style="font-size: 60px;"><input type="file" accept="image/*" style="" multiple></div></div>
+                </ul>
+            </li>
+        </ul>
+        <!--添加货源时，供应商有输入联想功能 start-->
+        <ul class="mui-table-view mui_lianxiang" style="display: none;" id="sup_sug">
+        
+        </ul>
+        <!--添加货源时，供应商有输入联想功能 end-->
+    </form>
+    <div class="mui-content-padded login-tips" id="error_tip" style="display: none;">
+        <span class="mui-icon mui-icon-close"></span><span id="error_msg">请输入正确信息</span>
+    </div>
+    <div class="footer_btn mui-text-center">
+        <a class="mui-btn mui-btn-primary mui-btn-block" id="save_btn" href="javascript:;" style="display: inline-block; width: 31%; margin-right: 2%">仅保存</a>
+        <a class="mui-btn mui-btn-primary mui-btn-block" id="submit_btn" href="javascript:;" style="display: inline-block; width: 65%">保存并提交审核</a>
+    </div>
+</div>
+<img id="im_exif" src="" style="display: none;" />
+<!--中间内容区 结束-->
+</body>
+<script src="../js/mui.min.js"></script>
+<script src="../js/mui.picker.js"></script>
+<script src="../js/mui.poppicker.js"></script>
+<script src="../js/master.js"></script>
+<script src="../js/exif.js"></script>
+<script src="../js/ext.js"></script>
+<script src="../js/goodsEdit.js"></script>
+<script src="../js/jquery-1.7.2.min.js"></script>
+<script src="../js/Sortable-edit.js" charset="utf-8"></script>
+<script src="../js/mui.zoom.js"></script>
+<script src="../js/mui.previewimage.js"></script>
+<script>
+    mui.init({
+        gestureConfig: {
+            longtap: true,
+        }
+    });
+	var sups = null;
+	var cat1 = "";
+	var cat2 = "";
+	var spec = "";
+	var cap = "";
+	mui.plusReady(function () {
+		
+		var self = plus.webview.currentWebview();
+		var gid = self.gid;
+		
+		if (gid) {
+			document.getElementById("title_label").textContent = "修改货源";
+			var goods = plus.storage.getItem("goods_" + gid);
+			if (goods) {
+				data = JSON.parse(goods);
+				document.getElementById("sup_phone").value = data.supPhone;
+				document.getElementById("commodityId").value = data.commodityId;
+				if (data.typeOneName != "") {
+					document.getElementById("levelPicker1").textContent = data.typeOneName;
+				}
+				cat1 = data.commodityTypeOne;
+				if (data.typeTwoName != "") {
+					document.getElementById("levelPicker2").textContent = data.typeTwoName;
+				}
+				cat2 = data.commodityTypeTwo;
+				document.getElementById("goods_name").value = data.name;
+				spec = data.specification;
+				if (spec != "") {
+					document.getElementById("goodsType").textContent = spec;
+				}
+				document.getElementById("goods_price").value = data.price;
+				document.getElementById("goods_remain").value = data.remain;
+				document.getElementById("goods_source").value = data.produceArea;
+				document.getElementById("goods_weight").value = data.weight;
+				
+				cap = data.fishingStyle;
+				if (cap != "") {
+					document.getElementById("modePicker").textContent = cap;
+				}
+				
+				document.getElementById("goods_summary").value = data.summary;
+				
+				var imgs = JSON.parse(data.imgUrl);
+				if (imgs && imgs.length > 0) {
+					for (var i = 0; i < imgs.length; i++) {
+						addImage(imgs[i]);
+					}
+				}
+				
+				if (cat1) {
+					loadLevel2(true);
+				}
+			} else {
+						
+			    async("GET", "/commodity/commodity-detail?commodityId=" + gid, {}, function (res) {
+			    	
+			    	data.commodityId = gid;
+			    	data.fishingStyle = res.data.fishingStyle;
+			    	data.imgUrl = JSON.stringify(res.data.imgUrls);
+			    	data.name = res.data.name;
+			    	data.price = res.data.price;
+			    	data.providerId = res.data.provider.id;
+			    	data.remain = res.data.remain;
+			    	data.specification = res.data.specification;
+			    	data.summary = res.data.summary;
+			    	data.weight = res.data.weight;
+			    	data.produceArea = res.data.produceArea;
+			    	data.supPhone = res.data.provider.tel;
+			    	data.commodityTypeOne = res.data.commodityTypeOne;
+			    	data.commodityTypeTwo = res.data.commodityTypeTwo;
+			    	data.typeOneName = res.data.commodityTypeOneName;
+			    	data.typeTwoName = res.data.commodityTypeTwoName;
+			    	
+					document.getElementById("sup_phone").value = data.supPhone;
+					document.getElementById("commodityId").value = data.commodityId;
+					if (data.typeOneName != "") {
+						document.getElementById("levelPicker1").textContent = data.typeOneName;
+					}
+					cat1 = data.commodityTypeOne;
+					if (data.typeTwoName != "") {
+						document.getElementById("levelPicker2").textContent = data.typeTwoName;
+					}
+					cat2 = data.commodityTypeTwo;
+					document.getElementById("goods_name").value = data.name;
+					spec = data.specification;
+					if (spec != "") {
+						document.getElementById("goodsType").textContent = spec;
+					}
+					document.getElementById("goods_price").value = data.price;
+					document.getElementById("goods_remain").value = data.remain;
+					document.getElementById("goods_source").value = data.produceArea;
+					document.getElementById("goods_weight").value = data.weight;
+					
+					cap = data.fishingStyle;
+					if (cap != "") {
+						document.getElementById("modePicker").textContent = cap;
+					}
+					
+					document.getElementById("goods_summary").value = data.summary;
+					
+					var imgs = JSON.parse(data.imgUrl);
+					if (imgs && imgs.length > 0) {
+						for (var i = 0; i < imgs.length; i++) {
+							addImage(imgs[i]);
+						}
+					}
+					
+					if (cat1) {
+						loadLevel2(true);
+					}
+			    });
+			}
+		}
+        
+        async("GET", "/provider/my-provider", {}, function (res) {
+        	if (res.data && res.data.length > 0) {
+        		sups = res.data;
+        	}
+        }, function () {}, true);
+        
+    	async("GET", "/codes/commodity-types?parentId=0", {}, function (res) {
+    		var data = [];
+    		for (var i = 0; i < res.data.length; i++) {
+    			data.push({
+    				value:res.data[i].id,
+    				text:res.data[i].name
+    			});
+    		}
+    		//商品一级分类
+	        var levelPicker1 = new mui.PopPicker();
+	        levelPicker1.setData(data);
+	        var levelButton1 = document.getElementById('levelPicker1');
+	        levelButton1.addEventListener('tap', function(event) {
+				document.activeElement.blur(); 
+	            levelPicker1.show(function(items) {
+	                levelButton1.innerText = items[0].text;
+	                cat1 = items[0].value;
+	                loadLevel2();
+	                //return false;
+	            });
+	        }, false);
+    	}, function () {}, true);
+    	
+    	
+        	
+    	async("GET", "/codes/commodity-fishingStyle", {}, function (res) {
+    		var data = [];
+    		for (var i = 0; i < res.data.length; i++) {
+    			data.push({
+    				value:res.data[i],
+    				text:res.data[i]
+    			});
+    		}
+    		
+	        //捕捞方式
+	        modePicker.setData(data);
+	        var modeButton = document.getElementById('modePicker');
+	        modeButton.addEventListener('tap', function(event) {
+				document.activeElement.blur(); 
+	            modePicker.show(function(items) {
+	                modeButton.innerText = items[0].text;
+	                cap = items[0].value;
+	            });
+	        }, false);
+    	}, function () {}, true);
+    	
+    	
+    	
+    	
+        var goodsTypeButton = document.getElementById('goodsType');
+        goodsTypeButton.addEventListener('tap', function(event) {
+			document.activeElement.blur(); 
+        	if (goodsTypePicker.getData().length > 0) {
+	            goodsTypePicker.show(function(items) {
+	                goodsTypeButton.innerText = items[0].text;
+	                spec = items[0].text;
+	            });
+           	}
+        }, false);
+        
+        var levelButton2 = document.getElementById('levelPicker2');
+        levelButton2.addEventListener('tap', function(event) {
+			document.activeElement.blur(); 
+        	if (levelPicker2.getData().length > 0) {
+	            levelPicker2.show(function(items) {
+	                levelButton2.innerText = items[0].text;
+	                cat2 = items[0].value;
+	                loadSpec();
+	            });
+        	}
+        }, false);
+        
+        document.addEventListener("tap", function () {
+        	document.getElementById("sup_sug").style.display = "none";
+//      	$(".shakecontainer").removeClass("shakecontainer");
+//      	$(".shake").removeClass("shake");
+        });
+        
+        document.getElementById("sup_phone").addEventListener("blur", function () {
+        	if (this.value.trim() != "") {
+	        	async("GET", "/provider/validateProvider?tel=" + this.value, {}, function (res) {
+	        		if (res && res.data) {
+	        			document.getElementById("goods_source").value = res.data.addressDetail;
+	        		}
+	        	}, function () {});
+        	}
+        });
+        
+        document.getElementById("sup_phone").addEventListener("keyup", function () {
+        	if (sups && sups.length > 0) {
+        		if (timer) {        			
+	        		clearTimeout(timer);
+	        		timer = null;
+        		}
+        		timer = setTimeout(function () {
+	        		var v = document.getElementById("sup_phone").value;
+	        		var sug = document.getElementById("sup_sug");
+	        		sug.innerHTML = "";
+        			var j = 0;
+	        		if (v != "") {
+		        		for (var i = 0; i < sups.length && j < 10; i++) {
+		        			var s = sups[i];
+		        			if (s.tel.indexOf(v) > -1 || s.name.indexOf(v) > -1) {
+		        				//     <li class="mui-table-view-cell"><a href="" class="">张三 <span class="mui-pull-right mui-text-right">15998655555</span></a></li>
+		        				var li = document.createElement("li");
+		        				li.className = "mui-table-view-cell";
+		        				sug.appendChild(li);
+		        				
+		        				var a = document.createElement("a");
+		        				li.appendChild(a);
+		        				
+		        				a.appendChild(document.createTextNode(s.name));
+		        				
+		        				
+		        				var span = document.createElement("span");
+		        				span.className = "mui-pull-right mui-text-right sup-name";
+		        				span.textContent = s.tel;
+		        				a.appendChild(span);
+		        				
+		        				a.addEventListener("tap", function () {
+		        					var tel = this.querySelector(".sup-name").textContent;
+		        					document.getElementById("sup_phone").value = tel;
+		        					document.getElementById("sup_sug").style.display = "none";
+		        				});
+		        				
+		        				j++;
+		        			}
+		        		}
+	        		}
+	        		
+	        		if (j > 0) {
+						document.getElementById("sup_sug").style.display = "block";
+	        		} else {
+						document.getElementById("sup_sug").style.display = "none";
+	        		}
+	        		
+        		}, 300);
+        	}
+        });
+        
+        if (mui.os.ios) {
+	        $("input[type=file]").bind("change", function (e) {
+	        	
+				if (this.value.indexOf("image.jpg") > 0) {
+					var file = this.files[0];				
+					var oReader = new FileReader();  
+			        oReader.onload = function(e) {
+			           	cutImage(e.target.result);  			            
+			        };  
+			        oReader.readAsDataURL(file);
+				} else {
+					plus.nativeUI.showWaiting();
+					fileCount = this.files.length;
+					for (var i = 0; i < this.files.length; i++) {
+						readImage(this.files[i]);
+					}
+				}
+				
+		        this.value = "";
+	        });
+        } else {
+        	$("input[type=file]").hide();
+        	$(".upload-btn").bind("tap", function (e) {
+				if ($(".img-father").size() > 8) {
+					return;
+				}
+	        	var a = [{
+	                title: "拍照"
+	            }, {
+	                title: "从手机相册选择"
+	            }];
+	            plus.nativeUI.actionSheet({
+	                title: "选择添加方式",
+	                cancel: "取消",
+	                buttons: a
+	            }, function(b) {
+	                switch(b.index) {
+	                    case 0:
+	                        break;
+	                    case 1:
+	                        getImage();
+	                        break;
+	                    case 2:
+	                        galleryImg();
+	                        break;
+	                    default:
+	                        break
+	                }
+	            });
+	            e.stopPropagation();
+        	});
+        }
+        
+        
+        document.getElementById("save_btn").addEventListener("tap", function () {
+        	fetchData();
+        	
+        	if (data.name == "") {
+        		showError("请至少输入商品名称");
+        		return;
+        	}
+
+        	
+			plus.nativeUI.showWaiting();
+        	
+        	setTimeout(function () {
+        			        	
+	        	if (data.commodityId == "") {
+	        		data.commodityId = "temp_" + new Date().getTime();
+	        	}
+	        	
+	        	goods_save(data);
+	        	
+				plus.nativeUI.closeWaiting();
+				
+	        	mui.toast("已保存");
+	        	mui.back();
+        	}, 0);
+        	
+        });
+        
+        
+        document.getElementById("submit_btn").addEventListener("tap", function () {
+        	fetchData();
+        	
+        	var param = {};
+        	
+        	if (data.supPhone == "") {
+        		showError("请输入供应商联系方式");
+        		return;
+        	}
+        	
+        	
+        	
+        	if (data.commodityTypeOne == "") {
+        		showError("请选择一级分类");
+        		return;
+        	}
+        	param.commodityTypeOne = data.commodityTypeOne;
+        	
+        	if (data.commodityTypeTwo == "") {
+        		showError("请选择二级分类");
+        		return;
+        	}
+        	
+        	param.commodityTypeTwo = data.commodityTypeTwo;
+        	if (data.name == "") {
+        		showError("请输入商品名称");
+        		return;
+        	}
+        	param.name = data.name;
+        	
+        	if (data.specification == "") {
+        		showError("请选择商品规格");
+        		return;
+        	}
+        	param.specification = data.specification;
+        	var reg = /^\d+([.]\d{1,2})?$/;
+        	if (data.price == "") {
+        		showError("请输入商品报价");
+        		return;
+        	} else if (!reg.test(data.price)) {
+        		showError("商品报价必须为数字，最多两位小数");
+        		return;
+        	}
+        	param.price = data.price;
+        	if (data.remain == "") {
+        		showError("请输入商品库存");
+        		return;
+        	} else if (!reg.test(data.remain)) {
+        		showError("商品库存必须为数字，最多两位小数");
+        		return;
+        	}
+        	param.remain = data.remain;
+        	if (data.produceArea == "") {
+        		showError("请输入货源地");
+        		return;
+        	}
+        	param.produceArea = data.produceArea;
+        	
+        	if (data.weight == "") {
+        		showError("请输入件重");
+        		return;
+        	} else if (!reg.test(data.weight)) {
+        		showError("件重必须为数字，最多两位小数");
+        		return;
+        	}
+        	param.weight = data.weight;
+        	if (data.fishingStyle == "") {
+        		showError("请选择捕捞方式");
+        		return;
+        	}
+        	param.fishingStyle = data.fishingStyle;
+        	
+        	if (data.summary == "") {
+        		showError("请输入详细说明");
+        		return;
+        	}
+        	param.summary = data.summary;
+        	
+        	var imgs = JSON.parse(data.imgUrl);
+        	if (imgs.length < 5) {
+        		showError("请至少上传5张照片");
+        		return;
+        	}
+        	
+        	if (data.commodityId && data.commodityId.substring(0, 5) != "temp_") {
+        		param.commodityId = data.commodityId;
+        	}
+
+        	async("GET", "/provider/validateProvider?tel=" + data.supPhone, {}, function (res) {
+        		if (res && res.data) {
+        			param.providerId = res.data.id;
+        			
+        			var uploads = [];
+        			var idx = [];
+        			for (var i = 0; i < imgs.length; i++) {
+        				if (imgs[i].substring(0, 4) != "http") {
+        					var u = {
+        						base64String:imgs[i].replace("data:image/jpeg;base64,", ""),
+        						fileName:new Date().getTime() + i + ".jpg"
+        					};
+        					uploads.push(u);
+        					idx.push(i);
+        				}
+        			}
+        			
+        			if (uploads.length > 0) {
+			        	async("POST", "/files/uploads", uploads, function (res) {
+			        		for (var i = 0; i < res.data.length; i++) {
+			        			var j = idx[i];
+			        			imgs[j] = res.data[i];
+			        		}
+			        		
+			        		for (var i = 0; i < imgs.length; i++) {
+			        			imgs[i] = imgs[i].replace("http://huacai.b0.upaiyun.com", "");
+			        		}
+			        		
+			        		param.imgUrl = JSON.stringify(imgs);
+			        		
+				        	async("POST", "/commodity/publish-commodity", param, function (res) {
+				        		goods_del(data.commodityId);
+					        	mui.toast("提交成功");
+					        	mui.back();
+				        	});
+			        		
+			        	});
+        			} else {
+        				param.imgUrl = data.imgUrl;
+			        	async("POST", "/commodity/publish-commodity", param, function (res) {
+			        		goods_del(data.commodityId);
+				        	mui.toast("提交成功");
+				        	mui.back();
+			        	});
+        			}
+        			
+        			
+        		}
+        	}, function () {
+        		showError("系统中不存在该供货商");
+        		return;
+        	});
+        	
+        	
+        });
+	});
+	
+	var data = {
+	  "commodityId": "",
+	  "commodityTypeOne": 0,
+	  "commodityTypeTwo": 0,
+	  "fishingStyle": "",
+	  "imgUrl": "",
+	  "name": "",
+	  "price": 0,
+	  "providerId": 0,
+	  "remain": 0,
+	  "specification": "",
+	  "summary": "",
+	  "weight": "",
+	  "produceArea": "",
+	  "typeOneName": "",
+	  "typeTwoName": "",
+	  "supPhone": ""
+	};
+	
+	function fetchData() {
+		data.commodityId = document.getElementById("commodityId").value;
+		data.commodityTypeOne = cat1;
+		data.commodityTypeTwo = cat2;
+		data.fishingStyle = cap;
+		var imgs = [];
+		$("#ul_imgs .item").each(function () {
+			imgs.push(this.getAttribute("src"));
+		});
+		data.imgUrl = JSON.stringify(imgs);
+		data.name = document.getElementById("goods_name").value.trim();
+		data.price = document.getElementById("goods_price").value;
+		data.remain = document.getElementById("goods_remain").value;
+		data.specification = spec;
+		data.weight = document.getElementById("goods_weight").value;
+		data.summary = document.getElementById("goods_summary").value;
+		data.supPhone = document.getElementById("sup_phone").value;
+		data.produceArea = document.getElementById("goods_source").value;
+		var levelPicker1 = document.getElementById("levelPicker1").textContent;
+		if (levelPicker1 == "请选择") {
+			levelPicker1 = "";
+		}
+		data.typeOneName = levelPicker1;
+		var levelPicker2 = document.getElementById("levelPicker2").textContent;
+		if (levelPicker2 == "请选择") {
+			levelPicker2 = "";
+		}
+		data.typeTwoName = levelPicker2;
+	}
+	
+	var timer = null;
+    var modePicker = new mui.PopPicker();
+    var levelPicker2 = new mui.PopPicker();
+	
+	function loadLevel2(quite) {
+		
+        //-----------------------------------------
+        //商品二级分类
+        levelPicker2.setData([]);
+        if (!quite) {
+	        var levelButton2 = document.getElementById('levelPicker2');
+	        levelButton2.innerText = "请选择";
+	        cat2 = "";
+	        
+	        
+	        goodsTypePicker.setData([]);
+	        var goodsTypeButton = document.getElementById('goodsType');
+	        goodsTypeButton.innerText = "请选择";
+	        spec = "";
+        }
+        
+		async("GET", "/codes/commodity-types?parentId=" + cat1, {}, function (res) {
+			
+    		var data = [];
+    		for (var i = 0; i < res.data.length; i++) {
+    			data.push({
+    				value:res.data[i].id,
+    				text:res.data[i].name
+    			});
+    		}
+			
+        	levelPicker2.setData(data);
+        	
+        	
+				
+			if (cat2) {
+				loadSpec(true);
+			}
+		});
+	}
+	
+    //商品规格
+    var goodsTypePicker = new mui.PopPicker();
+    
+	function loadSpec(quite) {
+		
+        if (!quite) {
+	        goodsTypePicker.setData([]);
+	        var goodsTypeButton = document.getElementById('goodsType');
+	        goodsTypeButton.innerText = "请选择";
+	        spec = "";
+        }
+        
+		async("GET", "/codes/commodity-specs?typeOneId=" + cat1 + "&typeTwoId=" + cat2, {}, function (res) {
+			
+    		var data = [];
+    		for (var i = 0; i < res.data.length; i++) {
+    			data.push({
+    				value:res.data[i].id,
+    				text:res.data[i].specification
+    			});
+    		}
+        	goodsTypePicker.setData(data);
+    		
+        });
+	}
+	
+	function showError(msg) {
+        
+        $("#error_msg").text(msg);
+        $("#error_tip").show();
+		
+		var h = $(document).height()-$(window).height();
+        $(document).scrollTop(h);
+	}
+	
+	
+    //拍照
+    function getImage() {
+        var c = plus.camera.getCamera();
+        c.captureImage(function(e) {
+            //存储到本地
+            plus.io.resolveLocalFileSystemURL(e, function(entry) {
+                cutImage(entry.toLocalURL());//裁剪图片，传入绝对地址
+            }, function(e) {
+                console.log("读取拍照文件错误：" + e.message);
+            });
+        }, function(s) {
+            console.log(JSON.stringify(s));
+        })
+    }
+    //相册
+    function galleryImg() {
+        plus.gallery.pick(function(a) {
+			plus.nativeUI.showWaiting();
+        	fileCount = a.files.length;
+	        for(var i in a.files){
+	            plus.io.resolveLocalFileSystemURL(a.files[i], function(entry) { 　　　　　　//entry为图片原目录（相册）流
+	                entry.file(function(file) {
+	                	
+	                    var scale = file.size / 1024 / 500;
+	                    if (scale < 1) {
+	                    	scale = 1;
+	                    }
+	                    
+	                    dealImage(entry.toLocalURL(), scale, addImage);
+	                });
+	            }, function(e) {
+	                console.log("读取图片错误：" + e.message);
+	            });
+	        }  
+        	
+        }, function(a) {},{filter:"image", multiple:true})
+    };
+    
+    function readImage(file) {
+    	
+		var oReader = new FileReader();  
+        oReader.onload = function(e) {
+        	var data = e.target.result;
+        	if (data.length / 1024 < 500) {
+        		addImage(data);
+        	} else {
+				var scale = data.length / 1024 / 500;
+    			dealImage(data, scale, addImage);
+        	}
+        };  
+        oReader.readAsDataURL(file);
+    }
+    
+	function cutImage(path) {
+        mui.openWindow({
+            url: 'PhotographEdit.html',
+            id: 'PhotographEdit',
+            extras: {
+            	src:"goods",
+				path: path,
+			}
+		});
+	}
+
+	function dealImage(path, scale, callback) {
+		var img = new Image();
+		img.onload = function() {
+			var that = this;
+			EXIF.getData(this, function() {
+	            var opt = EXIF.getAllTags(this).Orientation;
+	            
+				// 默认按比例压缩
+				var w = that.width / scale;
+				var h = that.height / scale;
+				
+				
+				
+					/*
+					scale = w / h;
+				w = obj.width || w;
+				h = obj.height || (w / scale);
+				*/
+				var quality = 0.9;
+				//生成canvas
+				var canvas = document.createElement('canvas');
+				var ctx = canvas.getContext('2d');
+				// 创建属性节点
+				var anw = document.createAttribute("width");
+				anw.nodeValue = w;
+				var anh = document.createAttribute("height");
+				anh.nodeValue = h;
+				canvas.setAttributeNode(anw);
+				canvas.setAttributeNode(anh);
+				
+				var imageWidth = w;
+				var imageHeight = h;
+				
+				if(opt == 6) {
+                    this.num = 90;
+	                canvas.height = imageWidth;
+	                canvas.width = imageHeight;
+                	ctx.rotate(this.num * Math.PI / 180);
+                	ctx.drawImage(that, 0, 0, that.width, that.height, 0, -imageHeight, imageWidth, imageHeight);
+                } else if(opt == 3) {
+                    this.num = 180;
+	                canvas.height = imageHeight;
+	                canvas.width = imageWidth;
+                	ctx.rotate(this.num * Math.PI / 180);
+                	ctx.drawImage(that, 0, 0, that.width, that.height, -imageWidth, -imageHeight, imageWidth, imageHeight);
+                } else if(opt == 8) {
+                    this.num = 270;
+	                canvas.height = imageWidth;
+	                canvas.width = imageHeight;
+                	ctx.rotate(this.num * Math.PI / 180);
+                	ctx.drawImage(that, 0, 0, that.width, that.height, -imageWidth, 0, imageWidth, imageHeight);
+                } else {
+	                canvas.height = imageHeight;
+	                canvas.width = imageWidth;
+                	ctx.drawImage(that, 0, 0, that.width, that.height, 0, 0, imageWidth, imageHeight);
+                }
+				
+				var base64 = canvas.toDataURL('image/jpeg', quality);
+				
+				callback(base64);
+	        });
+		}
+		img.src = path;
+	}
+	
+	function addImage(data) {
+		if (--fileCount <=0) {
+			plus.nativeUI.closeWaiting();
+		}
+		if($(".img-father").size() > 8) {
+			return;
+		}
+		
+		/*
+		<li data-li="<%=i%>">
+	        <div class="img-father">
+	            <div class="img-container drag-handle">
+	                <img class="item" src="../images/noimg.jpg" data-preview-src="" data-preview-group="1" data-content='face-0<%=i%>'/>
+	            </div>
+	            <i class="img-remove">×</i>
+	        </div>
+	    </li>
+	    */
+		// <div class="mui-col5"><img src="../images/noimg.jpg" alt=""><span class="mui-icon mui-icon-closeempty"></span></div>
+		var div = document.getElementById("ul_imgs");
+		var row = document.createElement("li");
+		row.setAttribute("data-li", $(".img-father").size() + 1);
+		
+		div.insertBefore(row, document.getElementById("img_add"));
+		
+		var father = document.createElement("div");
+		father.className = "img-father";
+		row.appendChild(father);
+		
+		if ($(".shakecontainer").size() > 0) {
+	        father.classList.add('shakecontainer');
+	        father.classList.add('shake');
+		}
+		
+		var drag = document.createElement("div");
+		drag.className = "img-container drag-handle";
+		father.appendChild(drag);
+		
+		var img = document.createElement("img");
+		img.className = "item";
+		
+		img.setAttribute("src", data);
+		img.setAttribute("data-preview-src", "");
+		img.setAttribute("data-preview-group", "1");
+		
+		img.addEventListener("load", function () {
+			this.style.height = this.offsetWidth + "px";
+		});
+		
+		img.addEventListener("longtap", function() {
+            if (document.querySelector("ul li .img-father").className.indexOf('shake') != -1)
+                return;
+            initForSort(false);
+        });
+		
+		drag.appendChild(img);
+		
+		var close = document.createElement("i");
+		close.className = "img-remove";
+		close.textContent = "x";
+		close.addEventListener("tap", function () {
+            this.parentNode.parentNode.remove();
+			$("input[type=file]").hide();
+			setTimeout(function () {
+				$("#img_add").show();
+				$("input[type=file]").show();
+			}, 500);
+		});
+		father.appendChild(close);
+		
+		mui.previewImage();
+		
+		setSortable(false);
+		
+		if ($(".img-father").size() > 8) {
+			$("#img_add").hide();
+			$("input[type=file]").hide();
+		}
+	}
+		
+    function initForSort(isTriggerByBtn) {
+        if (isTriggerByBtn) return;
+        mui("ul li .img-father").each(function() {
+            this.classList.add('shakecontainer');
+            this.classList.add('shake');
+        });
+    };
+    
+    
+    function setSortable(isTriggerByBtn) {
+    	if (sort) {
+    		sort.destroy();
+    		sort = false;
+    	}
+        sort = new Sortable(document.getElementById("ul_imgs"), {
+            chosenClass: 'sort-chosen',
+            ghostClass: 'sort-ghost',
+            delay: 150,
+            animation: 400,
+            handle: '.drag-handle',
+            //-------- 自定义属性
+            isDropAnimation: false, //DragDrop时是否对DragEl启用滑动效果
+            ghostScale:1.2,//DragGhostEl 缩放效果
+            //--------
+            onStart: function( /**Event*/ evt) { // 拖拽
+                touchtime = evt.timeStamp;
+                item_offset.left = evt.item.offsetLeft;
+                item_offset.top = evt.item.offsetTop;
+                var itemEl = evt.item;
+            },
+            onEnd: function( /**Event*/ evt) { // 拖拽
+                var itemEl = evt.item;
+                var timespan = evt.timeStamp - touchtime;
+                if (timespan < 200) {} else if (itemEl.offsetLeft == item_offset.left && itemEl.offsetTop == item_offset.top) {} else {
+                    reset_order();
+                }
+                touchtime = null;
+            },
+        });
+    };
+
+    function reset_order() {
+        //重新进行排序
+        [].forEach.call(document.querySelectorAll("#ul_imgs li"), function(item, index) {
+            var li = item;
+            li.setAttribute('new-data-li', index + 1);
+        });
+    };
+	
+	var sort = false;
+	
+    var touchtime, item_offset = {
+        left: '',
+        top: ''
+    };
+    
+    var fileCount = 0;
+</script>
+</html>

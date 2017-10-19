@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html>
+
+	<head>
+		<meta charset="utf-8">
+		<title></title>
+		<meta name="viewport" content="width=device-width, initial-scale=1,maximum-scale=1,user-scalable=no">
+		<meta name="apple-mobile-web-app-capable" content="yes">
+		<meta name="apple-mobile-web-app-status-bar-style" content="black">
+		<!--标准mui.css-->
+		<link rel="stylesheet" href="../css/mui.min.css">
+		<!--App自定义的css-->
+		<link rel="stylesheet" href="../css/bass.css">
+	</head>
+	<body class="errorMain">
+		<!--顶部标题栏 开始-->
+		<header class="mui-bar mui-bar-nav">
+			<a class="mui-action-back mui-icon mui-icon-left-nav mui-pull-left"></a>
+			<h1 class="mui-title">帮助中心</h1>
+		</header>
+		<!--顶部标题栏 线束-->
+		<!--中间内容区 开始-->
+		<div class="mui-content">
+			<ul class="mui-table-view" style="margin-top: 0" id="list_ul">
+			
+			</ul>
+		</div>
+		<!--中间内容区 结束-->
+	</body>
+	<script src="../js/mui.min.js"></script>
+	<script src="../js/master.js"></script>
+	<script src="../js/ext.js"></script>
+	<script type="text/javascript">
+		mui.plusReady(function () {
+			 async("GET", "/helpCenter/helpCenters", {}, function (res) {
+			 	if (res.data && res.data.length > 0) {
+					var ul = document.getElementById("list_ul");
+			 		for (var i = 0; i < res.data.length; i++) {
+			 			var item = res.data[i];
+			 			/*
+						<li class="mui-table-view-cell mui-collapse">
+							<a class="mui-navigate-right" href="#">海鲜过期的时候怎么处理？</a>
+							<div class="mui-collapse-content">
+								海鲜过期的时候。。。
+							</div>
+						</li>
+						*/
+						var li = document.createElement("li");
+						li.className = "mui-table-view-cell mui-collapse";
+						ul.appendChild(li);
+						
+						var a = document.createElement("a");
+						a.className = "mui-navigate-right";
+						a.setAttribute("href", "#");
+						a.textContent = item.title;
+						li.appendChild(a);
+						
+						var div = document.createElement("div");
+						div.className = "mui-collapse-content";
+						div.textContent = item.content;
+						li.appendChild(div);
+			 		}
+			 		
+			 		mui.init();
+			 	}
+			 });
+		});
+	</script>
+</html>

@@ -1,0 +1,198 @@
+
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <title></title>
+    <meta name="viewport" content="width=device-width, initial-scale=1,maximum-scale=1,user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <!--标准mui.css-->
+    <link rel="stylesheet" href="../css/mui.min.css">
+    <!--App自定义的css-->
+    <link rel="stylesheet" href="../css/bass.css">
+    <link href="../css/cropper.min.css" rel="stylesheet" />
+</head>
+<body class="">
+<!--顶部标题栏 开始-->
+<header class="mui-bar mui-bar-nav">
+    <a class="mui-action-back mui-icon mui-icon-left-nav mui-pull-left"></a>
+    <h1 class="mui-title">剪裁照片</h1>
+</header>
+<!--顶部标题栏 线束-->
+<!--中间内容区 开始-->
+<div class="mui-content">
+    <h5 class="mui-text-center" style="position: relative; z-index: 999999; background: #fff; margin:0; padding:5px 0;">请移动或者调整拍摄内容集中到框线内</h5>
+    <div id="cropper-example-1" class="PhotographEdit mui-hidden">
+    	<img id="im" alt="Picture" />
+    </div>
+	<img src="" alt="" class="mui-hidden" id="im_exif" />
+    <div style="position: fixed; bottom: 20px; right: 20px;">
+        <a id='confirmBtn' class="mui-btn mui-btn-primary mui-btn-outlined" style="color: #fff">确定剪裁</a>
+    </div>
+</div>
+<!--中间内容区 结束-->
+</body>
+<script src="../js/jquery-1.7.2.min.js"></script>
+<script src="../js/mui.min.js"></script>
+<script src="../js/exif.js"></script>
+<script src="../js/cropper.min.js"></script>
+<script src="../js/app.min.js"></script>
+<script src="../js/ext.js"></script>
+	
+<script>
+	var backvar = false;
+    (function(c) {
+        var Cro = function() {}
+        c.extend(Cro.prototype, {
+            orientation: null,
+            urldata: null,
+            view: null,
+            num: 0,
+            sbx: null,
+            sby: null,
+            n: 0,
+            onReady: function() {
+                var that = this;
+                mui.init({
+                	beforeback:function () {
+                		if (backvar) return true;
+                		var btnArray = ['继续编辑', '退出编辑'];
+				        mui.confirm('图片还没有保存，返回不会保存图片', '提示信息', btnArray, function(e) {
+				            if (e.index == 0) {
+				            	
+				            } else {
+				            	backvar = true;
+				            	mui.back();
+				            }
+				        });
+				        
+		            	return false;
+                	}
+                });
+                
+                that.view = plus.webview.currentWebview();
+
+                var img = document.getElementById("im_exif");
+                img.addEventListener("load", function() {
+                    //exif调整图片的横竖
+                    EXIF.getData(this, function() {
+                        var orientation = EXIF.getAllTags(this).Orientation;
+                        $("#im").attr("src", that.loadcopyImg(img, orientation));
+                        document.getElementById("cropper-example-1").classList.remove("mui-hidden"); //显示裁剪区域
+                        that.cropperImg();
+						plus.nativeUI.closeWaiting();
+                    });
+                });
+                img.src = that.view.path;
+            },
+            cropperImg: function() {
+                var that = this;
+                $('#cropper-example-1 > img').cropper({
+                    aspectRatio: 1 / 1,
+                    autoCropArea: 0.9,
+                    strict: true,
+                    background: false,
+                    guides: false,
+                    highlight: true,
+                    dragCrop: false,
+                    movable: false,
+                    resizable: false,
+                    crop: function(data) {
+                        that.urldata = that.base64(data);
+                    }
+                });
+            },
+            loadcopyImg: function(img, opt) {
+                var that = this;
+                var canvas = document.createElement("canvas");
+                var imageWidth, imageHeight;
+                
+                if(img.width > img.height) {
+                    imageHeight = document.body.clientWidth * 2; //this.width;
+                    imageWidth = Math.round(document.body.clientWidth * img.width / img.height) * 2;
+                } else {
+                    imageWidth = document.body.clientWidth * 2;
+                    imageHeight = Math.round(document.body.clientWidth * img.height / img.width) * 2;
+                }
+            
+	                
+                canvas.height = imageHeight;
+                canvas.width = imageWidth;
+                
+                var ctx = canvas.getContext("2d");
+                if(opt == 6) {
+                    that.num = 90;
+	                canvas.height = imageWidth;
+	                canvas.width = imageHeight;
+                	ctx.rotate(that.num * Math.PI / 180);
+                	ctx.drawImage(img, 0, 0, img.width, img.height, 0, -imageHeight, imageWidth, imageHeight);
+                } else if(opt == 3) {
+                    that.num = 180;
+	                canvas.height = imageHeight;
+	                canvas.width = imageWidth;
+                	ctx.rotate(that.num * Math.PI / 180);
+                	ctx.drawImage(img, 0, 0, img.width, img.height, -imageWidth, -imageHeight, imageWidth, imageHeight);
+                } else if(opt == 8) {
+                    that.num = 270;
+	                canvas.height = imageWidth;
+	                canvas.width = imageHeight;
+                	ctx.rotate(that.num * Math.PI / 180);
+                	ctx.drawImage(img, 0, 0, img.width, img.height, -imageWidth, 0, imageWidth, imageHeight);
+                } else {
+	                canvas.height = imageHeight;
+	                canvas.width = imageWidth;
+                	ctx.drawImage(img, 0, 0, img.width, img.height, 0, 0, imageWidth, imageHeight);
+                }
+
+                /*
+                ctx.translate(imageWidth / 2, imageHeight / 2);
+                ctx.rotate(that.num * Math.PI / 180);
+                ctx.translate(-imageWidth / 2, -imageHeight / 2);
+                
+                ctx.drawImage(img, 0, 0, imageWidth, imageHeight);
+                */
+                var dataURL = canvas.toDataURL("image/jpeg", 1);
+                return dataURL;
+            },
+            base64: function(data) {
+                var that = this;
+                var img = document.getElementById("im");
+
+                var canvas = document.createElement("canvas");
+                //像素
+                canvas.height = data.width;
+                canvas.width = data.height;
+                var bx = data.x;
+                var by = data.y;
+                var ctx = canvas.getContext("2d");
+                ctx.drawImage(img, bx, by, data.width, data.height, 0, 0, data.width, data.height);
+                var dataURL = canvas.toDataURL("image/jpeg", 1.0);            //第二个参数是质量
+                return dataURL;
+            }
+        });
+
+        var cro = new Cro();
+
+        c.plusReady(function() {
+			plus.nativeUI.showWaiting();
+		    jQuery(".PhotographEdit").css("height",jQuery(document).height()-68);
+		    
+            cro.onReady();
+    
+		    document.getElementById("confirmBtn").addEventListener('tap', function() {
+		        
+	            mui.openWindow({
+	                url: 'watermark.html',
+	                id: 'watermark',
+	                extras: {
+	                	src:plus.webview.currentWebview().src,
+	                    path: cro.urldata,
+	                }
+	            });
+		    });
+        })
+    })(mui)
+</script>
+</html>

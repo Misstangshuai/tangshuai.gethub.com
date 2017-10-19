@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <title></title>
+    <meta name="viewport" content="width=device-width, initial-scale=1,maximum-scale=1,user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <!--标准mui.css-->
+    <link rel="stylesheet" href="../css/mui.min.css">
+    <!--App自定义的css-->
+    <link rel="stylesheet" href="../css/bass.css">
+</head>
+<body class="goodsEditMain">
+<!--顶部标题栏 开始-->
+<header class="mui-bar mui-bar-nav">
+    <a class="mui-action-back mui-icon mui-icon-left-nav mui-pull-left"></a>
+    <h1 class="mui-title">供应商详情</h1>
+</header>
+<!--顶部标题栏 线束-->
+<!--中间内容区 开始-->
+<div class="mui-content" style="margin-bottom: 70px">
+    <ul class="mui-table-view" style="margin-top: 0">
+        <li class="mui-table-view-cell mui-disabled">
+            <label>供应商姓名</label>
+            <span class="mui-pull-right mui-text-left" style="width: 65%" id="s_name"></span>
+        </li>
+        <li class="mui-table-view-cell mui-disabled">
+            <label>联系方式</label>
+            <span class="mui-pull-right mui-text-left" style="width: 65%" id="s_tel"></span>
+        </li>
+        <li class="mui-table-view-cell mui-disabled">
+            <label>微信号码</label>
+            <span class="mui-pull-right mui-text-left" style="width: 65%" id="s_wx"></span>
+        </li>
+        <li class="mui-table-view-cell mui-disabled">
+            <label>公司名称</label>
+            <span class="mui-pull-right mui-text-left" style="width: 65%" id="s_comp"></span>
+        </li>
+        <li class="mui-table-view-cell mui-disabled">
+            <label>货源地</label>
+            <span class="mui-pull-right mui-text-left" style="width: 65%" id="s_addr"></span>
+        </li>
+        <li class="mui-table-view-cell mui-disabled">
+            <label>文字说明</label>
+            <span class="mui-pull-right mui-text-left" style="width: 65%;" id="s_remark"></span>
+        </li>
+    </ul>
+    <div class="footer_btn mui-text-center">
+        <a class="mui-btn mui-btn-primary mui-btn-block" href="javascript:;" id="s_btn">联系该客户</a>
+    </div>
+</div>
+<!--中间内容区 结束-->
+</body>
+<script src="../js/mui.min.js"></script>
+<script src="../js/master.js"></script>
+<script src="../js/ext.js"></script>
+<script>
+	mui.plusReady(function () {
+		var self = plus.webview.currentWebview();
+		async("GET", "/provider/provider-detail?id=" + self.sid, {}, function (res) {
+			document.getElementById("s_name").textContent = res.data.name;
+			document.getElementById("s_tel").textContent = res.data.tel;
+			document.getElementById("s_wx").textContent = res.data.weixinName;
+			document.getElementById("s_comp").textContent = res.data.providerName;
+			document.getElementById("s_addr").textContent = res.data.addressDetail;
+			document.getElementById("s_remark").textContent = res.data.remark;
+			document.getElementById("s_btn").setAttribute("href", "tel:" + res.data.tel);
+		});
+	});
+</script>
+</html>

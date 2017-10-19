@@ -1,0 +1,584 @@
+<!DOCTYPE html>
+<html>
+
+	<head>
+		<meta charset="utf-8">
+		<title></title>
+		<meta name="viewport" content="width=device-width, initial-scale=1,maximum-scale=1,user-scalable=no">
+		<meta name="apple-mobile-web-app-capable" content="yes">
+		<meta name="apple-mobile-web-app-status-bar-style" content="black">
+		<!--标准mui.css-->
+		<link rel="stylesheet" href="../css/mui.min.css">
+		<link rel="stylesheet" href="../css/app.min.css">
+		<!--App自定义的css-->
+		<link rel="stylesheet" href="../css/bass.css">
+		<style>
+			.orderMain .mui-table-view .mui-media-object {width: 100px;}
+			.text-green {color:#119977;}
+		</style>
+	</head>
+	<body class="orderMain goodsMain">
+		<!--顶部标题栏 开始-->
+		<header class="mui-bar mui-bar-nav">
+			<a class="mui-action-back mui-icon mui-icon-left-nav mui-pull-left"></a>
+			<h1 class="mui-title">我的货源</h1>
+		</header>
+		<!--顶部标题栏 线束-->
+		<!--中间内容区 开始-->
+		<div class="mui-content">
+			<div style="padding: 10px 10px;">
+				<div id="segmentedControl" class="mui-segmented-control">
+					<a class="mui-control-item mui-active" data-type="0" href="#item1">编辑中</a>
+					<a class="mui-control-item" style="display: none;" data-type="1" href="#item2">待审核</a>
+					<a class="mui-control-item" style="display: none;" data-type="2" href="#item3">审核中</a>
+					<a class="mui-control-item" data-type="3" href="#item4">已上架</a>
+					<a class="mui-control-item" data-type="4" href="#item5">已下架</a>
+				</div>
+			</div>
+			<div>
+				<div id="item1" class="mui-control-content mui-active">
+					<div class="mui-scroll-wrapper scroll">
+						<div class="mui-scroll">
+							<ul class="mui-table-view" id="tc_0">
+								
+							</ul>
+						</div>
+					</div>
+				</div>
+				<div id="item2" class="mui-control-content">
+					<div class="mui-scroll-wrapper scroll">
+						<div class="mui-scroll">
+							<ul class="mui-table-view" id="tc_1">
+								
+							</ul>
+						</div>
+					</div>
+				</div>
+				<div id="item3" class="mui-control-content">
+					<div class="mui-scroll-wrapper scroll">
+						<div class="mui-scroll">
+							<ul class="mui-table-view" id="tc_2">
+							</ul>
+						</div>
+					</div>
+				</div>
+				<div id="item4" class="mui-control-content">
+					<div class="mui-scroll-wrapper scroll">
+						<div class="mui-scroll">
+							<ul class="mui-table-view" id="tc_3">
+							</ul>
+						</div>
+					</div>
+				</div>
+				<div id="item5" class="mui-control-content">
+					<div class="mui-scroll-wrapper scroll">
+						<div class="mui-scroll">
+							<ul class="mui-table-view" id="tc_4">
+							</ul>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="footer_btn">
+				<a class="mui-btn mui-btn-primary mui-btn-block wxm_a" href="javascript:;" data-href="goodsAdd.html">添加货源</a>
+			</div>
+		</div>
+		<!--中间内容区 结束-->
+	</body>
+	<script src="../js/jquery-1.7.2.min.js"></script>
+	<script src="../js/mui.min.js"></script>
+	<script src="../js/app.min.js"></script>
+	<script src="../js/ext.js"></script>
+	<script src="../js/master.js"></script>
+	<script>
+		jQuery(function () {
+			var allH= jQuery(window).height();
+			jQuery(".mui-control-content").css("height",allH-166);
+		});
+		(function($) { 
+			//tab切换中显示滚动条，顶部固定
+			$('.scroll').scroll({
+				indicators: true //是否显示滚动条
+			});
+			var segmentedControl = document.getElementById('segmentedControl');
+			$('.mui-input-group').on('change', 'input', function() {
+				if (this.checked) {
+					var styleEl = document.querySelector('input[name="style"]:checked');
+					var colorEl = document.querySelector('input[name="color"]:checked');
+					if (styleEl && colorEl) {
+						var style = styleEl.value;
+						var color = colorEl.value;
+						segmentedControl.className = 'mui-segmented-control' + (style ? (' mui-segmented-control-' + style) : '') + ' mui-segmented-control-' + color;
+					}
+				}
+			});
+		})(mui);
+		
+		mui.plusReady(function () {
+			var user = getUser();
+			if (user.roleName == "组长") {
+				$(".mui-control-item").eq(1).show();
+				$(".mui-control-item").eq(2).show();
+			} else {
+				$(".mui-control-item").eq(2).show();
+				$(".mui-control-item").eq(1).hide();
+			}
+			
+			loadTc(0);
+			
+			
+			window.addEventListener("viewAppear", function () {
+				var type = $("#segmentedControl").find(".mui-active").attr("data-type");
+				loadTc(type);
+			});
+			
+			
+			
+			$(".mui-control-item").bind("tap", function () {
+				var idx = this.getAttribute("data-type");
+				
+				loadTc(idx);
+			});
+		});
+		
+		function loadTc(index) {
+			if (index == 0) {
+				var ul = $("#tc_0");
+				ul.empty();
+				var list = plus.storage.getItem("goods_list");
+				
+				if (list) {
+					list = JSON.parse(list);
+					if (list.length > 0) {
+						
+						for (var i = list.length - 1; i >= 0; i--) {
+							if (list[i].indexOf("temp") > -1) {							
+								var item = plus.storage.getItem("goods_" + list[i]);
+								if (item) {
+									var data = JSON.parse(item);
+									var imgs = JSON.parse(data.imgUrl);
+									/*
+									<li class="mui-table-view-cell mui-media">
+										<div href="javascript:;" class="mui-slider-handle">
+											<img class="mui-media-object mui-pull-left" src="../images/images02.jpg">
+											<div class="mui-media-body">
+												<h4 class="mui-ellipsis">阿根廷鱿鱼</h4>
+												<p class="mui-ellipsis">货源地：广东省舟山市</p>
+												<p class="mui-ellipsis">规格：100-200</p>
+												<p class="mui-ellipsis">数量：100吨</p>
+												<a href="goodsEdit.html" class="mui-btn mui-btn-primary wxm_a"><span class="mui-icon mui-icon-compose"></span></a>
+											</div>
+										</div>
+										<div class="mui-slider-right mui-disabled">
+											<button type="button" class="mui-btn mui-btn-red goodsDel">删除</button>
+										</div>
+									</li>
+									*/
+									var li = document.createElement("li");
+									li.className = "mui-table-view-cell mui-media";
+									ul.append(li);
+									var slider = document.createElement("div");
+									slider.className = "mui-slider-handle";
+									li.appendChild(slider);
+									var img = document.createElement("img");
+									img.className = "mui-media-object mui-pull-left";
+									if (imgs.length > 0) {
+										img.setAttribute("src", imgs[0]);
+									} else {
+										img.setAttribute("src", "../images/noimg.jpg");
+									}
+									slider.appendChild(img);
+									var body = document.createElement("div");
+									body.className = "mui-media-body";
+									slider.appendChild(body);
+									var name = document.createElement("h4");
+									name.className = "mui-ellipsis";
+									name.textContent = data.name;
+									body.appendChild(name);
+									var source = document.createElement("p");
+									source.className = "mui-ellipsis";
+									source.textContent = "货源地：" + nvl(data.produceArea);
+									body.appendChild(source);
+									var spec = document.createElement("p");
+									spec.className = "mui-ellipsis";
+									spec.textContent = "规格：" + nvl(data.specification);
+									body.appendChild(spec);
+									var remain = document.createElement("p");
+									remain.className = "mui-ellipsis";
+									remain.textContent = "数量：" + data.remain;
+									body.appendChild(remain);
+									var a = document.createElement("a");
+									a.className = "mui-btn mui-btn-primary wxm_a";
+									a.setAttribute("href", "javascript:;");
+									a.setAttribute("data-href", "goodsAdd.html?gid=" + data.commodityId);
+									a.innerHTML = '<span class="mui-icon mui-icon-compose"></span>';
+									body.appendChild(a);
+									a.addEventListener("tap", linkForward);
+									var right = document.createElement("div");
+									right.className = "mui-slider-right mui-disabled";
+									li.appendChild(right);
+									var del = document.createElement("button");
+									del.setAttribute("type", "button");
+									del.className = "mui-btn mui-btn-red goodsDel";
+									del.textContent = "删除";
+									del.setAttribute("data-id", data.commodityId);
+									right.appendChild(del);
+									del.addEventListener("tap", function () {
+										var elem = this;
+										var li = elem.parentNode.parentNode;
+										mui.confirm('确认删除该条记录？', '系统提示', [ '取消','确认'], function(e) {
+											if (e.index == 1) {
+												
+												plus.nativeUI.showWaiting();
+									        	
+									        	setTimeout(function () {
+									        		goods_del(elem.getAttribute("data-id"));
+													
+													li.parentNode.removeChild(li);
+													plus.nativeUI.closeWaiting();
+												}, 0);
+											} else {
+												setTimeout(function() {
+													mui.swipeoutClose(li);
+												}, 0);
+											}
+										});
+									});
+									
+								}
+							}
+						}
+					}
+				}
+				return;
+			} else {
+				
+				var ul = document.getElementById("tc_" + index);
+				ul.innerHTML = "";
+				
+				async("GET", "/commodity/my-commodities?checkCode=" + (index - 1), {}, function (res) {
+					if (index == 1) {
+						/*
+						<li class="mui-table-view-cell mui-media">
+							<a href="goodsDetails.html" class="mui-navigate-right wxm_a">
+								<h6 class="text-red" style="padding-bottom: 6px">!需要重点审核该项目</h6>
+								<img class="mui-media-object mui-pull-left" src="../images/noimg.jpg">
+								<div class="mui-media-body">
+									<h4 class="mui-ellipsis">阿根廷鱿鱼</h4>
+									<p class="mui-ellipsis">提交人：张全蛋</p>
+									<p class="mui-ellipsis">货源地：广东省舟山市</p>
+									<p class="mui-ellipsis">规格：100-200</p>
+									<p class="mui-ellipsis">数量：100吨</p>
+									<p class='mui-ellipsis'>当前报价：10000.00元/吨</p>
+								</div>
+							</a>
+						</li>
+						*/
+						if (res.data && res.data.commodityList && res.data.commodityList.length > 0) {
+							
+							for (var i = 0; i < res.data.commodityList.length; i++) {
+								var item = res.data.commodityList[i];
+								var li = document.createElement("li");
+								li.className = "mui-table-view-cell mui-media";
+								ul.appendChild(li);
+								
+								var a = document.createElement("a");
+								a.className = "mui-navigate-right wxm_a";
+								a.setAttribute("href", "javascript:;");
+								a.setAttribute("data-href", "goodsDetail.html?gid=" + item.id + "&status=1");
+								a.addEventListener("tap", linkForward);
+								li.appendChild(a);
+								
+								if (item.cautionToAudit) {
+									var h6 = document.createElement("h6");
+									h6.className = "text-red";
+									h6.setAttribute("style", "padding-bottom: 6px");
+									h6.textContent = "!需要重点审核该项目";
+									a.appendChild(h6);
+								}
+								
+								var img = document.createElement("img");
+								img.className = "mui-media-object mui-pull-left";
+								if (item.imgUrls && item.imgUrls.length > 0) {
+									img.setAttribute("src", item.imgUrls[0]);
+								} else {
+									img.setAttribute("src", "../images/noimg.jpg");
+								}
+								a.appendChild(img);
+								
+								var body = document.createElement("div");
+								body.className = "mui-media-body";
+								a.appendChild(body);
+								
+								var name = document.createElement("h4");
+								name.className = "mui-ellipsis";
+								name.textContent = item.name;
+								body.appendChild(name);
+								
+								var op = document.createElement("p");
+								op.className = "mui-ellipsis";
+								op.textContent = "提交人：" + item.opOne;
+								body.appendChild(op);
+								
+								var src = document.createElement("p");
+								src.className = "mui-ellipsis";
+								src.textContent = "货源地：" + item.produceArea;
+								body.appendChild(src);
+								
+								var spec = document.createElement("p");
+								spec.className = "mui-ellipsis";
+								spec.textContent = "规格：" + item.specification;
+								body.appendChild(spec);
+								
+								var num = document.createElement("p");
+								num.className = "mui-ellipsis";
+								num.textContent = "数量：" + item.remain + "吨";
+								body.appendChild(num);
+								
+								var price = document.createElement("p");
+								price.className = "mui-ellipsis";
+								price.textContent = "当前报价：" + item.price + "元/吨";
+								body.appendChild(price);
+							}
+						}
+						
+					} else if (index == 2) {
+						/*
+						<li class="mui-table-view-cell mui-media">
+							<div class="mui_dian"></div>
+								<img class="mui-media-object mui-pull-left" src="../images/noimg.jpg">
+								<div class="mui-media-body">
+									<h4 class="mui-ellipsis">阿根廷鱿鱼</h4>
+									<p class="mui-ellipsis">货源地：广东省舟山市</p>
+									<p class="mui-ellipsis">规格：100-200</p>
+									<p class="mui-ellipsis">数量：100吨</p>
+									<p class="mui-ellipsis">失败原因：图片不清晰</p>
+									<h6 class="text-red">审核失败</h6>
+									<a href="goodsEdit.html" class="mui-btn mui-btn-primary wxm_a"><span class="mui-icon mui-icon-compose"></span></a>
+								</div>
+						</li>
+						*/
+						
+						if (res.data && res.data.commodityList && res.data.commodityList.length > 0) {
+							
+							for (var i = 0; i < res.data.commodityList.length; i++) {
+								var item = res.data.commodityList[i];
+								var li = document.createElement("li");
+								li.className = "mui-table-view-cell mui-media";
+								ul.appendChild(li);
+								
+								li.setAttribute("data-href", "goodsDetail.html?gid=" + item.id + "&status=2");
+								li.addEventListener("tap", linkForward);
+								
+								if (item.checkStatus == 3 || item.checkStatus == 5) {
+									var dian = document.createElement("div");
+									dian.className = "mui_dian";
+									li.appendChild(dian);
+								}
+								
+								var img = document.createElement("img");
+								img.className = "mui-media-object mui-pull-left";
+								if (item.imgUrls && item.imgUrls.length > 0) {
+									img.setAttribute("src", item.imgUrls[0]);
+								} else {
+									img.setAttribute("src", "../images/noimg.jpg");
+								}
+								li.appendChild(img);
+								
+								var body = document.createElement("div");
+								body.className = "mui-media-body";
+								li.appendChild(body);
+								
+								var name = document.createElement("h4");
+								name.className = "mui-ellipsis";
+								name.textContent = item.name;
+								body.appendChild(name);
+								
+								var src = document.createElement("p");
+								src.className = "mui-ellipsis";
+								src.textContent = "货源地：" + item.produceArea;
+								body.appendChild(src);
+								
+								var spec = document.createElement("p");
+								spec.className = "mui-ellipsis";
+								spec.textContent = "规格：" + item.specification;
+								body.appendChild(spec);
+								
+								var num = document.createElement("p");
+								num.className = "mui-ellipsis";
+								num.textContent = "数量：" + item.remain + "吨";
+								body.appendChild(num);
+								
+								if (item.checkStatus == 3 || item.checkStatus == 5) {
+									var fail = document.createElement("p");
+									fail.className = "mui-ellipsis";
+									fail.textContent = "失败原因：" + item.failCause;
+									body.appendChild(fail);
+								}
+								
+								var audit = document.createElement("h6");
+								if (item.checkStatus == 3 || item.checkStatus == 5) {
+									audit.className = "text-red";
+									audit.textContent = "审核失败";
+								} else if (item.checkStatus == 2 || item.checkStatus == 4) {
+									audit.className = "text-green";
+									audit.textContent = "审核通过";
+								} else {
+									audit.textContent = "审核中";
+								}
+								body.appendChild(audit);
+								
+								if (item.checkStatus == 3 || item.checkStatus == 5) {
+									var a = document.createElement("a");
+									a.className = "mui-btn mui-btn-primary wxm_a";
+									a.setAttribute("href", "javascript:;");
+									a.setAttribute("data-href", "goodsAdd.html?gid=" + item.id);
+									a.innerHTML = '<span class="mui-icon mui-icon-compose"></span>';
+									body.appendChild(a);
+									a.addEventListener("tap", linkForward);
+								}
+							}
+						}
+					} else if (index == 3) {
+						/*
+						<li class="mui-table-view-cell mui-media">
+							<img class="mui-media-object mui-pull-left" src="../images/images02.jpg">
+							<div class="mui-media-body">
+								<h4 class="mui-ellipsis">阿根廷鱿鱼</h4>
+								<p class="mui-ellipsis">商品编号：adh1234</p>
+								<p class="mui-ellipsis">货源地：广东省舟山市</p>
+								<p class="mui-ellipsis">规格：100-200</p>
+								<p class="mui-ellipsis">数量：100吨</p>
+								<a href="goodsEdit2.html" class="mui-btn mui-btn-primary wxm_a"><span class="mui-icon mui-icon-compose"></span></a>
+							</div>
+						</li>
+						*/
+						
+						if (res.data && res.data.commodityList && res.data.commodityList.length > 0) {
+							
+							for (var i = 0; i < res.data.commodityList.length; i++) {
+								var item = res.data.commodityList[i];
+								var li = document.createElement("li");
+								li.className = "mui-table-view-cell mui-media";
+								ul.appendChild(li);
+								
+								li.setAttribute("data-href", "goodsDetail.html?gid=" + item.id + "&status=3");
+								li.addEventListener("tap", linkForward);
+								
+								var img = document.createElement("img");
+								img.className = "mui-media-object mui-pull-left";
+								if (item.imgUrls && item.imgUrls.length > 0) {
+									img.setAttribute("src", item.imgUrls[0]);
+								} else {
+									img.setAttribute("src", "../images/noimg.jpg");
+								}
+								li.appendChild(img);
+								
+								var body = document.createElement("div");
+								body.className = "mui-media-body";
+								li.appendChild(body);
+								
+								var name = document.createElement("h4");
+								name.className = "mui-ellipsis";
+								name.textContent = item.name;
+								body.appendChild(name);
+								
+								var code = document.createElement("p");
+								code.className = "mui-ellipsis";
+								code.textContent = "商品编号：" + item.code;
+								body.appendChild(code);
+								
+								var src = document.createElement("p");
+								src.className = "mui-ellipsis";
+								src.textContent = "货源地：" + item.produceArea;
+								body.appendChild(src);
+								
+								var spec = document.createElement("p");
+								spec.className = "mui-ellipsis";
+								spec.textContent = "规格：" + item.specification;
+								body.appendChild(spec);
+								
+								var num = document.createElement("p");
+								num.className = "mui-ellipsis";
+								num.textContent = "数量：" + item.remain + "吨";
+								body.appendChild(num);
+																
+								var a = document.createElement("a");
+								a.className = "mui-btn mui-btn-primary wxm_a";
+								a.setAttribute("href", "javascript:;");
+								a.setAttribute("data-href", "goodsAdjust.html?gid=" + item.id);
+								a.innerHTML = '<span class="mui-icon mui-icon-compose"></span>';
+								body.appendChild(a);
+								a.addEventListener("tap", linkForward);
+							}
+						}	
+					} else if (index == 4) {
+						/*
+						<li class="mui-table-view-cell mui-media">
+							<img class="mui-media-object mui-pull-left" src="../images/images02.jpg">
+							<div class="mui-media-body">
+								<h4 class="mui-ellipsis">阿根廷鱿鱼</h4>
+								<p class="mui-ellipsis">商品编号：adh1234</p>
+								<p class="mui-ellipsis">货源地：广东省舟山市</p>
+								<p class="mui-ellipsis">下架原因：运营下架/库存不足</p>
+								<p class="mui-ellipsis">下架时间：2017-06-30</p>
+							</div>
+						</li>
+						*/
+						
+						if (res.data && res.data.commodityList && res.data.commodityList.length > 0) {
+							
+							for (var i = 0; i < res.data.commodityList.length; i++) {
+								var item = res.data.commodityList[i];
+								var li = document.createElement("li");
+								li.className = "mui-table-view-cell mui-media";
+								ul.appendChild(li);
+								
+								li.setAttribute("data-href", "goodsDetail.html?gid=" + item.id + "&status=4");
+								li.addEventListener("tap", linkForward);
+								
+								var img = document.createElement("img");
+								img.className = "mui-media-object mui-pull-left";
+								if (item.imgUrls && item.imgUrls.length > 0) {
+									img.setAttribute("src", item.imgUrls[0]);
+								} else {
+									img.setAttribute("src", "../images/noimg.jpg");
+								}
+								li.appendChild(img);
+								
+								var body = document.createElement("div");
+								body.className = "mui-media-body";
+								li.appendChild(body);
+								
+								var name = document.createElement("h4");
+								name.className = "mui-ellipsis";
+								name.textContent = item.name;
+								body.appendChild(name);
+								
+								var code = document.createElement("p");
+								code.className = "mui-ellipsis";
+								code.textContent = "商品编号：" + item.code;
+								body.appendChild(code);
+								
+								var src = document.createElement("p");
+								src.className = "mui-ellipsis";
+								src.textContent = "货源地：" + item.produceArea;
+								body.appendChild(src);
+								
+								var fail = document.createElement("p");
+								fail.className = "mui-ellipsis";
+								fail.textContent = "下架原因：" + nvl(item.sold0utCause);
+								body.appendChild(fail);
+								
+								var time = document.createElement("p");
+								time.className = "mui-ellipsis";
+								time.textContent = "下架时间：" + item.modifyTime.substring(alert, 10);
+								body.appendChild(time);
+							}
+						}	
+					}
+				});
+			}
+		}
+	</script>
+</html>

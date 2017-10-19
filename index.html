@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html>
+
+	<head>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no" />
+		<title></title>
+		<script src="js/mui.min.js"></script>
+		<script type="text/javascript" charset="utf-8">
+			mui.plusReady(function() {
+				// plus.storage.removeItem("remember");
+				var r = plus.storage.getItem("remember");
+				var token = plus.storage.getItem("token");
+				if (r == "Y" && token != "") {
+					mui.openWindow({
+						url: "html/main.html",
+						id: "main"
+					});
+				} else {
+					plus.storage.removeItem("token");
+					mui.openWindow({
+						url:"html/login.html",
+						id:"login"
+					});
+				}
+			});
+		</script>
+	</head>
+
+	<body>
+	</body>
+
+</html>

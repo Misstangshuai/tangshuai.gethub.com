@@ -1,0 +1,381 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <title></title>
+    <meta name="viewport" content="width=device-width, initial-scale=1,maximum-scale=1,user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <!--标准mui.css-->
+    <link rel="stylesheet" href="../css/mui.min.css">
+    <!--App自定义的css-->
+    <link rel="stylesheet" href="../css/icons-extra.css" />
+    <link rel="stylesheet" href="../css/mui.picker.css">
+    <link rel="stylesheet" href="../css/mui.poppicker.css">
+    <link rel="stylesheet" href="../css/bass.css">
+    <style>
+    	
+        .mui-preview-image.mui-fullscreen {
+            position: fixed;
+            z-index: 999;
+            background-color: #000;
+        }
+        .mui-preview-header,
+        .mui-preview-footer {
+            position: absolute;
+            width: 100%;
+            left: 0;
+            z-index: 10;
+        }
+        .mui-preview-header {
+            height: 44px;
+            top: 0;
+        }
+        .mui-preview-footer {
+            height: 50px;
+            bottom: 0px;
+        }
+        .mui-preview-header .mui-preview-indicator {
+            display: block;
+            line-height: 25px;
+            color: #fff;
+            text-align: center;
+            margin: 15px auto 4px;
+            width: 70px;
+            background-color: rgba(0, 0, 0, 0.4);
+            border-radius: 12px;
+            font-size: 16px;
+        }
+        .mui-preview-image {
+            display: none;
+            -webkit-animation-duration: 0.5s;
+            animation-duration: 0.5s;
+            -webkit-animation-fill-mode: both;
+            animation-fill-mode: both;
+        }
+        .mui-preview-image.mui-preview-in {
+            -webkit-animation-name: fadeIn;
+            animation-name: fadeIn;
+        }
+        .mui-preview-image.mui-preview-out {
+            background: none;
+            -webkit-animation-name: fadeOut;
+            animation-name: fadeOut;
+        }
+        .mui-preview-image.mui-preview-out .mui-preview-header,
+        .mui-preview-image.mui-preview-out .mui-preview-footer {
+            display: none;
+        }
+        .mui-zoom-scroller {
+            position: absolute;
+            display: -webkit-box;
+            display: -webkit-flex;
+            display: flex;
+            -webkit-box-align: center;
+            -webkit-align-items: center;
+            align-items: center;
+            -webkit-box-pack: center;
+            -webkit-justify-content: center;
+            justify-content: center;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            margin: 0;
+            -webkit-backface-visibility: hidden;
+        }
+        .mui-zoom {
+            -webkit-transform-style: preserve-3d;
+            transform-style: preserve-3d;
+        }
+        .mui-slider .mui-slider-group .mui-slider-item img {
+            width: auto;
+            height: auto;
+            max-width: 100%;
+            max-height: 100%;
+        }
+        .mui-android-4-1 .mui-slider .mui-slider-group .mui-slider-item img {
+            width: 100%;
+        }
+        .mui-android-4-1 .mui-slider.mui-preview-image .mui-slider-group .mui-slider-item {
+            display: inline-table;
+        }
+        .mui-android-4-1 .mui-slider.mui-preview-image .mui-zoom-scroller img {
+            display: table-cell;
+            vertical-align: middle;
+        }
+        .mui-preview-loading {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            display: none;
+        }
+        .mui-preview-loading.mui-active {
+            display: block;
+        }
+        .mui-preview-loading .mui-spinner-white {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            margin-left: -25px;
+            margin-top: -25px;
+            height: 50px;
+            width: 50px;
+        }
+        .mui-preview-image img.mui-transitioning {
+            -webkit-transition: -webkit-transform 0.5s ease, opacity 0.5s ease;
+            transition: transform 0.5s ease, opacity 0.5s ease;
+        }
+        @-webkit-keyframes fadeIn {
+            0% {
+                opacity: 0;
+            }
+            100% {
+                opacity: 1;
+            }
+        }
+        @keyframes fadeIn {
+            0% {
+                opacity: 0;
+            }
+            100% {
+                opacity: 1;
+            }
+        }
+        @-webkit-keyframes fadeOut {
+            0% {
+                opacity: 1;
+            }
+            100% {
+                opacity: 0;
+            }
+        }
+        @keyframes fadeOut {
+            0% {
+                opacity: 1;
+            }
+            100% {
+                opacity: 0;
+            }
+        }
+        p img {
+            max-width: 100%;
+            height: auto;
+        }
+        .mui-slider-img-content {
+            position: absolute;
+            bottom: 10px;
+            left: 10px;
+            right: 10px;
+            color: white;
+            text-align: center;
+            line-height: 21px
+        }
+        
+        .goodsEditMain .mui-row5 .mui-col5 {
+		    position: relative;
+		    padding: 5px;
+		    width: 20%;
+		    float: left;
+		}
+    	
+    </style>
+</head>
+<body class="goodsEditMain goodsDetails">
+<!--顶部标题栏 开始-->
+<header class="mui-bar mui-bar-nav">
+    <a class="mui-action-back mui-icon mui-icon-left-nav mui-pull-left"></a>
+    <h1 class="mui-title">调整信息</h1>
+</header>
+<!--顶部标题栏 线束-->
+<!--中间内容区 开始-->
+<div class="mui-content" style="margin-bottom: 70px">
+    <div class="mui-input-group">
+        <ul class="mui-table-view">
+            <li class="mui-table-view-cell mui-disabled mui-disabled_layer">
+                <label>供应商联系方式</label>
+                <span class="mui-pull-right mui-text-left" style="width: 65%" id="sup_phone"></span>
+            </li>
+            <li class="mui-table-view-cell mui-disabled mui-disabled_layer">
+                <label>商品一级分类</label>
+                <span class="mui-pull-right mui-text-left" style="width: 65%" id="cat_1"></span>
+            </li>
+            <li class="mui-table-view-cell mui-disabled mui-disabled_layer">
+                <label>商品二级分类</label>
+                <span class="mui-pull-right mui-text-left" style="width: 65%" id="cat_2"></span>
+            </li>
+            <li class="mui-table-view-cell mui-disabled mui-disabled_layer">
+                <label>商品名称</label>
+                <span class="mui-pull-right mui-text-left" style="width: 65%" id="goods_name"></span>
+            </li>
+            <li class="mui-table-view-cell mui-disabled mui-disabled_layer">
+                <label>商品规格</label>
+                <span class="mui-pull-right mui-text-left" style="width: 65%" id="goods_spec"></span>
+            </li>
+            <li class="mui-table-view-cell mui-disabled"><div class="">
+                <label>当前报价</label>
+                <input type="number" step="0.01" class="mui-input mui-input-clear w50" id="goods_price" placeholder="0.00">
+                <span class="mui-pull-right">元/吨</span>
+            </div></li>
+            <li class="mui-table-view-cell mui-disabled"><div class="">
+                <label>当前库存</label>
+                <input type="number" class="mui-input mui-input-clear w50" id="goods_remain" placeholder="0.00">
+                <span class="mui-pull-right">吨</span>
+            </div></li>
+            <li class="mui-table-view-cell mui-disabled mui-disabled_layer">
+                <label>件重</label>
+                <span class="mui-pull-right" style="width: 20%">Kg/件</span>
+                <span class="mui-pull-right mui-text-left" style="width: 45%" id="goods_weight"></span>
+            </li>
+            <li class="mui-table-view-cell mui-disabled mui-disabled_layer">
+                <label>捕捞方式</label>
+                <span class="mui-pull-right mui-text-left" style="width: 65%" id="fishing_style"></span>
+            </li>
+            <li class="mui-table-view-cell mui-disabled mui-disabled_layer">
+                <label>文字说明</label>
+                <span class="mui-pull-right mui-text-left" style="width: 65%;" id="goods_summary"></span>
+            </li>
+            <li class="mui-table-view-cell mui-disabled mui-disabled_layer">
+                <label>货源照片</label>
+            </li>
+            <li class="mui-table-view-cell mui-disabled mui-disabled_layer">
+                <div class="mui-row5 mui-clearfix" id="goods_imgs">
+                	
+                </div>
+            </li>
+        </ul>
+    </div>
+    <div class="mui-content-padded login-tips" id="error_tip" style="display: none;">
+        <span class="mui-icon mui-icon-close"></span><span id="error_msg">请输入正确信息</span>
+    </div>
+    <div class="footer_btn mui-text-center">
+        <a class="mui-btn mui-btn-primary mui-btn-block" id="promptBtn" style="display: inline-block; width: 31%; margin-right: 2%">下架</a>
+        <a class="mui-btn mui-btn-primary mui-btn-block" id="submitBtn" href="javascript:;" style="display: inline-block; width: 65%">确认修改</a>
+    </div>
+</div>
+<!--中间内容区 结束-->
+
+</body>
+<script src="../js/mui.min.js"></script>
+<script src="../js/mui.picker.js"></script>
+<script src="../js/mui.poppicker.js"></script>
+<script src="../js/master.js"></script>
+<script src="../js/jquery-1.7.2.min.js"></script>
+<script src="../js/ext.js"></script>
+<script src="../js/mui.zoom.js"></script>
+<script src="../js/mui.previewimage.js"></script>
+<script>
+	var shares = null;
+	var data = null;
+	mui.plusReady(function () {
+	    document.getElementById("promptBtn").addEventListener('tap', function(e) {
+	        e.detail.gesture.preventDefault(); //修复iOS 8.x平台存在的bug，使用plus.nativeUI.prompt会造成输入法闪一下又没了
+	        var btnArray = ['取消', '确定下架'];
+	        mui.prompt('请描述下架的原因', '商品库存为0', '确认下架', btnArray, function(e) {
+	            if (e.index == 1) {
+	            	if (e.value == "") {
+	            		mui.toast("请输入下架原因");
+	            		return false;
+	            	} else if (e.value.length > 20) {
+	            		mui.toast("下架原因不能超过20字");
+	            		return false;
+	            	}
+	            	
+	            	
+	            	var self = plus.webview.currentWebview();
+	            	async("POST", "/commodity/shift-off?commodityId=" + self.gid + "&sold0utCause=" + e.value, {}, function () {
+	            		mui.toast("操作成功");
+	            		mui.back();
+	            	});
+	            } else {
+	            }
+	        })
+	    });
+	    
+	    document.getElementById("submitBtn").addEventListener("tap", function () {
+	    	
+        	var self = plus.webview.currentWebview();
+        	
+        	var param = {};
+        	
+        	var price = document.getElementById("goods_price").value;
+        	var remain = document.getElementById("goods_remain").value;
+        	
+        	var reg = /^\d+([.]\d{1,2})?$/;
+        	if (price == "") {
+        		showError("请输入商品报价");
+        		return;
+        	} else if (!reg.test(price)) {
+        		showError("商品报价必须为数字，最多两位小数");
+        		return;
+        	}
+        	param.price = price;
+        	if (remain == "") {
+        		showError("请输入商品库存");
+        		return;
+        	} else if (!reg.test(remain)) {
+        		showError("商品库存必须为数字，最多两位小数");
+        		return;
+        	}
+        	param.remain = remain;
+        	
+        	param.commodityId = self.gid;
+        	
+        	async("POST", "/commodity/update-commodity", param, function () {
+        		mui.toast("操作成功");
+        		mui.back();
+        	});
+	    });
+	    
+	    var gid = plus.webview.currentWebview().gid;
+	    
+	    async("GET", "/commodity/commodity-detail?commodityId=" + gid, {}, function (res) {
+	    	data = res.data;
+	    	// <div class="mui-col5"><img src="../images/noimg.jpg" alt=""></div>
+	    	document.getElementById("sup_phone").textContent = res.data.provider.tel;
+	    	document.getElementById("cat_1").textContent = res.data.commodityTypeOneName;
+	    	document.getElementById("cat_2").textContent = res.data.commodityTypeTwoName;
+	    	document.getElementById("goods_name").textContent = res.data.name;
+	    	document.getElementById("goods_spec").textContent = res.data.specification;
+	    	document.getElementById("goods_price").value = res.data.price;
+	    	document.getElementById("goods_remain").value = res.data.remain;
+	    	document.getElementById("goods_weight").textContent = res.data.weight;
+	    	document.getElementById("fishing_style").textContent = res.data.fishingStyle;
+	    	document.getElementById("goods_summary").textContent = res.data.summary;
+	    	if (res.data.imgUrls && res.data.imgUrls.length > 0) {
+	    		var imgs = document.getElementById("goods_imgs");
+	    		for (var i = 0; i < res.data.imgUrls.length; i++) {
+	    			var item = document.createElement("div");
+	    			item.className = "mui-col5";
+	    			imgs.appendChild(item);
+	    			var img = document.createElement("img");
+					img.addEventListener("load", function () {
+						this.style.height = this.offsetWidth + "px";
+					});
+	    			img.setAttribute("src", res.data.imgUrls[i]);
+					img.setAttribute("data-preview-src", "");
+					img.setAttribute("data-preview-group", "1");
+					item.appendChild(img);
+	    		}
+	    		
+				mui.previewImage();
+	    	}
+	    });
+	});
+	
+	function showError(msg) {
+        
+        $("#error_msg").text(msg);
+        $("#error_tip").show();
+		
+		var h = $(document).height()-$(window).height();
+        $(document).scrollTop(h);
+	}
+	
+</script>
+</html>

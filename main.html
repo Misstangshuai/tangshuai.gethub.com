@@ -1,0 +1,456 @@
+<!DOCTYPE html>
+<html>
+
+	<head>
+		<meta charset="utf-8">
+		<title></title>
+		<meta name="viewport" content="width=device-width, initial-scale=1,maximum-scale=1,user-scalable=no">
+		<meta name="apple-mobile-web-app-capable" content="yes">
+		<meta name="apple-mobile-web-app-status-bar-style" content="black">
+		<!--标准mui.css-->
+		<link rel="stylesheet" href="../css/mui.min.css">
+		<link rel="stylesheet" href="../css/app.min.css">
+		<link rel="stylesheet" href="../css/icons-extra.css">
+		<!--App自定义的css-->
+		<link rel="stylesheet" href="../css/bass.css">
+		<style>
+			#uploadImage {position: fixed; bottom:0; left:33%; width:34%; height:50px; display:block; opacity: 0; z-index: 1000;}
+			
+		</style>
+	</head>
+	<body>
+        <!--底部导航栏 开始-->
+		<nav class="mui-bar mui-bar-tab">
+			<a class="mui-tab-item mui-active" href="#tabbar-card">
+				<span class="mui-icon mui-icon-home"></span>
+				<span class="mui-tab-label">首页</span>
+			</a>
+			<a class="mui-tab-item" id="tab_cap" href="javascript:void(0)">
+				<div class="tabbar-photo">
+					<span class="mui-icon mui-icon-camera"></span>
+				</div>
+			</a>
+			<a class="mui-tab-item" href="#tabbar-person">
+				<span class="mui-icon mui-icon-person"></span>
+				<span class="mui-tab-label">个人中心</span>
+			</a>
+		</nav>
+		<input type="file" accept="image/*" id="uploadImage" capture="camera"/>
+        <!--底部导航栏 结束-->
+        <!--中间内容区 开始-->
+		<div id="offCanvasContentScroll" class="mui-scroll-wrapper">
+			<div class="mui-scroll">
+				<div class="mui-content" style="margin-top: 44px; margin-bottom: 100px">
+					<div id="tabbar-card" class="mui-control-content mui-active">
+						<header class="mui-bar mui-bar-nav">
+							<!--<a class="mui-action-back mui-icon mui-icon-left-nav mui-pull-left"></a>-->
+							<h1 class="mui-title">首页</h1>
+						</header>
+						<div class="mui-row headerBody">
+							<div class="mui-col-xs-3 mui-col-sm-3"><img id="home_head" alt=""></div>
+							<div class="mui-col-xs-9 mui-col-sm-9">
+								<h4 style="font-size: 16px">HI，<span id="home_user"></span> <span id="home_time"></span></h4>
+								<h6>昨日业绩：成交金额：<span id="last_money">0.00</span>元</h6>
+								<h6>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;成交吨数：<span id="last_tun">0.00</span>吨</h6>
+							</div>
+						</div>
+						<div class="mui-row headerBody mui-text-center" style="padding-top: 0">
+							<a class="mui-col-xs-4 mui-col-sm-4 wxm_a" href="javascript:;" data-href="supplier.html">
+								<span class="mui-icon-extra mui-icon-extra-peoples">
+									
+								</span>
+								<h6>供应商管理</h6>
+							</a>
+							<a class="mui-col-xs-4 mui-col-sm-4 wxm_a" href="javascript:;" data-href="goods.html">
+								<span class="mui-icon-extra mui-icon-extra-class" id="num_com">
+									
+								</span>
+								<h6>货源管理</h6>
+							</a>
+							<a class="mui-col-xs-4 mui-col-sm-4 wxm_a" href="javascript:;" data-href="order.html">
+								<span class="mui-icon-extra mui-icon-extra-gold" id="num_order">
+									
+								</span>
+								<h6>订单管理</h6>
+							</a>
+						</div>
+						<div class="newsMain" id="news_list">
+							
+						</div>
+						<!--没有消息时 显示出现这句话 start-->
+						<h5 class="mui-text-center" id="list_empty" style="padding: 50px 0; display: none;">真棒！目前没有新的信息，快去拓展新的客户吧！</h5>
+						<!--没有消息时 显示出现这句话 end-->
+						<h6 class="mui-text-center"><a href="javascript:;" data-href="news_list.html" class="wxm_a">查看全部消息 ></a></h6>
+					</div>
+					<!--拍照 开始-->
+					<!--<div id="tabbar-photo" class="mui-control-content">-->
+						<!--<header class="mui-bar mui-bar-nav">-->
+							<!--&lt;!&ndash;<a class="mui-action-back mui-icon mui-icon-left-nav mui-pull-left"></a>&ndash;&gt;-->
+							<!--<h1 class="mui-title">拍照</h1>-->
+						<!--</header>-->
+					<!--</div>-->
+					<!--拍照 结束-->
+					<!--个人中心 开始-->
+					<div id="tabbar-person" class="mui-control-content">
+						<header class="mui-bar mui-bar-nav">
+							<!--<a class="mui-action-back mui-icon mui-icon-left-nav mui-pull-left"></a>-->
+							<h1 class="mui-title">个人中心</h1>
+						</header>
+						<div class="userImg mui-text-center">
+							<img id="user_head" alt="" width="70px" height="70px">
+							<h5 id="user_name"></h5>
+						</div>
+						<ul class="mui-table-view">
+							<li class="mui-table-view-cell">
+								<a class="mui-navigate-right wxm_a" href="javascript:;" data-href="password.html">
+									修改密码
+								</a>
+							</li>
+							<li class="mui-table-view-cell">
+								<a class="mui-navigate-right wxm_a" href="javascript:;" data-href="help.html">
+									帮助中心 
+								</a>
+							</li>
+						</ul>
+						<div class="copyright mui-text-center">
+							<h5>客服电话：<span id="srv_tel"></span></h5>
+							<a id="logout" href="javascript:;" class="mui-btn mui-btn-primary wxm_a" style="width: 30%">退出登录</a>
+							<h5>版本号：V<span id="version_num"></span></h5>
+						</div>
+					</div>
+					<!--个人中心 结束-->
+				</div>
+			</div>
+		</div>
+        <!--中间内容区 结束-->
+		<!--版本升级（选择） 版本更新（强制） 开始-->
+		<!--<div style="position: fixed; left: 50px; bottom: 60px; z-index: 100">-->
+			<!--<button id='alertBtn' type="button" class="mui-btn mui-btn-blue mui-btn-outlined">版本更新（强制）</button>-->
+			<!--<button id='confirmBtn' type="button" class="mui-btn mui-btn-blue mui-btn-outlined">版本升级（选择）</button>-->
+		<!--</div>-->
+		<!--版本升级（选择） 版本更新（强制） 结束-->
+	</body>
+	<script src="../js/mui.min.js"></script>
+	<script src="../js/app.min.js"></script>
+	<script src="../js/master.js"></script>
+	<script src="../js/ext.js"></script>
+	<script type="text/javascript" charset="utf-8">
+		var first = null;
+		mui.init({
+			beforeback:function(){
+				if(!first) {
+					first = new Date().getTime();
+					mui.toast('再按一次退出应用');
+					setTimeout(function() {
+						first = null;
+					}, 2000);
+				} else {
+					if(new Date().getTime() - first < 2000) {
+						plus.runtime.quit();
+					}
+				}
+				return false;
+			}
+		});
+		
+		function greeting() {
+			var h = new Date().getHours();
+			var greeting = "早上好";
+			if (h > 12 && h <= 14) {
+				greeting = "中午好";
+			} else if (h > 14 && h <= 18) {
+				greeting = "下午好";
+			} else if (h > 18 || h <= 4) {
+				greeting = "晚上好";
+			}
+			document.getElementById("home_time").textContent = greeting;
+		}
+		
+		var timer = null;
+		mui.plusReady(function () {
+			
+			if (timer != null) {
+				clearInterval(timer);
+			}
+			greeting();
+			timer = setInterval(greeting, 3600000);
+			
+			async("GET", "/auth/user", {}, function (res) {
+				var user = res.data[0];
+				mui.extend(user, res.data[1]);
+				plus.storage.setItem("login_user", JSON.stringify(user));
+				
+				document.getElementById("home_user").textContent = user.name;
+				document.getElementById("user_name").textContent = user.name;
+				document.getElementById("home_head").setAttribute("src", user.avatarPath);
+				document.getElementById("user_head").setAttribute("src", user.avatarPath);
+			});
+			
+			async("GET", "/index/", {}, function (res) {
+				var com = res.data.countCommodity;
+				var order = res.data.countOrder;
+				
+				if (com > 0) {
+					document.getElementById("num_com").innerHTML = '<span class="mui-badge">' + com + '</span>';
+				}
+				
+				if (order > 0) {
+					document.getElementById("num_order").innerHTML = '<span class="mui-badge">' + order + '</span>';
+				}
+			}, function () {}, true);
+			
+			
+			
+			async("GET", "/index/lastDayResult", {}, function (res) {
+				var mon = res.data.dealAmount;
+				var tun = res.data.amount;
+				
+				document.getElementById("last_money").textContent = formatMoney(mon, 2, "");
+				document.getElementById("last_tun").textContent = formatMoney(tun, 2, "");
+			}, function () {}, true);
+			
+			
+			
+			document.getElementById("srv_tel").textContent = settings.pass_tel;
+		    console.log("----------------" + plus.push.getClientInfo().clientid);
+			
+			plus.runtime.getProperty(plus.runtime.appid, function(i){
+			    document.getElementById("version_num").textContent = i.version;
+			    
+				var deviceType = mui.os.ios ? 2 : 1;
+				
+				async("GET", "/appVersion/versionInfo?versionCode=" + i.version + "&deviceType=" + deviceType, {}, function (res) {
+					if (res.data && res.data.flag == 1) {
+						if (res.data.updateInstall == 1) {
+							mui.alert(res.data.versionDesc, '版本更新', "立即更新", function() {
+								plus.runtime.openURL(res.data.downloadUrl);
+							});
+						} else {
+							document.getElementById("confirmBtn").addEventListener('tap', function() {
+								var btnArray = ['下次再说', '立即下载'];
+								mui.confirm(res.data.versionDesc, '版本更新', btnArray, function(e) {
+									if (e.index == 1) {
+										plus.runtime.openURL(res.data.downloadUrl);
+									} else {
+									}
+								})
+							});
+						}
+					}
+				}, function () {}, true);
+			});
+			
+			document.getElementById("logout").addEventListener("tap", function () {
+				async("GET", "/auth/logout", {}, function (res) {
+				}, function () {					
+				}, true);
+				logout();
+				
+			});
+			
+			document.getElementById("uploadImage").addEventListener("change", function () {
+				plus.nativeUI.showWaiting();
+				var file = this.files[0];
+				
+				var oReader = new FileReader();  
+		        oReader.onload = function(e) {
+					plus.nativeUI.closeWaiting();
+		           	cutImage(e.target.result);  
+		            
+		        };  
+		        oReader.readAsDataURL(file);
+		        this.value = "";
+			});
+			
+			document.getElementById("tab_cap").addEventListener("tap", function (e) {
+                if (mui.os.ios) {
+					return;
+                }
+                getImage();
+                return;
+				
+			});
+			
+			if (!mui.os.ios) {
+				document.getElementById("uploadImage").style.display = "none";
+			}
+			
+			loadMsg();
+			window.addEventListener("viewAppear", loadMsg);
+		});
+		
+		function loadMsg() {
+			async("GET", "/informationPush/informationPushNotRead", {}, function (res) {
+				var news_list = document.getElementById("news_list");
+				var list_empty = document.getElementById("list_empty");
+				news_list.innerHTML = "";
+				if (res.data && res.data.length > 0) {
+					list_empty.style.display = "none";
+					news_list.style.display = "block";
+					
+					/*
+					<div class="mui-card">
+						<div class="mui-card-header" style="background: #666; color: #fff; font-size: 14px">
+							<div class="mui-pull-left">采货通知</div>
+							<div class="mui-pull-right">2017-07-06</div>
+						</div>
+						<div class="mui-card-content">
+							<div class="mui-card-content-inner">
+								舟山市菜市场王老五家新到一批鱿鱼，请 <a href="" id='toastBtn'>采货 ></a>
+							</div>
+						</div>
+					</div>
+					 */
+					
+					for (var i = 0; i < res.data.length && i < 2; i++) {
+						var item = res.data[i];
+						var card = document.createElement("div");
+						card.className = "mui-card";
+						news_list.appendChild(card);
+						
+						card.setAttribute("data-type", item.type);
+						card.setAttribute("data-gid", item.commodityId);
+						card.setAttribute("data-oid", item.orderId);
+						card.setAttribute("data-id", item.id);
+						card.setAttribute("data-salespersonName", item.salespersonName);
+						
+						var header = document.createElement("div");
+						header.className = "mui-card-header";
+						
+						card.appendChild(header);
+						
+						var left = document.createElement("div");
+						left.className = "mui-pull-left";
+						header.appendChild(left);
+						if (item.type == 1) {
+							header.setAttribute("style", "background: #666; color: #fff; font-size: 14px;");
+							left.textContent = "采货通知";
+						} else if (item.type == 2) {
+							header.setAttribute("style", "background: #e3e3e3; color: #000; font-size: 14px;");
+							left.textContent = "订单通知";
+						} else if (item.type == 3) {
+							header.setAttribute("style", "background: #666; color: #fff; font-size: 14px;");
+							left.textContent = "组员分享货源";
+						}
+						
+						var right = document.createElement("div");
+						right.className = "mui-pull-right";
+						header.appendChild(right);
+						right.textContent = item.createTime.substring(0, 10);
+						
+						var content = document.createElement("div");
+						content.className = "mui-card-content";
+						card.appendChild(content);
+						
+						var inner = document.createElement("div");
+						inner.className = "mui-card-content-inner";
+						content.appendChild(inner);
+						inner.textContent = item.content;
+						
+						card.addEventListener("tap", function () {
+							var type = this.getAttribute("data-type");
+							var oid = this.getAttribute("data-oid");
+							var gid = this.getAttribute("data-gid");
+							var id = this.getAttribute("data-id");
+							var salespersonName = this.getAttribute("data-salespersonName");
+							
+							async("GET", "/informationPush/editStatus?id=" + id, {}, function () {
+							
+								if (type == 1) {
+									
+									mui.openWindow({
+										url: "goodsAdd.html",
+										id: "goodsAdd"
+									});
+								} else if (type == 2) {
+									
+									mui.openWindow({
+										url: "orderDetail.html",
+										id: "orderDetail",
+										extras: {
+											oid:oid
+										}
+									});
+								} else if (type == 3) {
+									
+									mui.openWindow({
+										url: "goodsDetail.html",
+										id: "goodsDetail",
+										extras: {
+											gid:gid,
+											status:99,
+											salespersonName:salespersonName
+										}
+									});
+								}
+							});
+						});
+					}
+					
+				} else {
+					news_list.style.display = "none";
+					list_empty.style.display = "block";
+				}
+			}, function () {}, true);
+		}
+		
+        //拍照
+        function getImage() {
+            var c = plus.camera.getCamera();
+            c.captureImage(function(e) {
+                //存储到本地
+                plus.io.resolveLocalFileSystemURL(e, function(entry) {
+                    cutImage(entry.toLocalURL());//裁剪图片，传入绝对地址
+                }, function(e) {
+                    console.log("读取拍照文件错误：" + e.message);
+                });
+            }, function(s) {
+                console.log(JSON.stringify(s));
+            })
+        }
+        //相册
+        function galleryImg() {
+            plus.gallery.pick(function(a) {
+                plus.io.resolveLocalFileSystemURL(a, function(entry) { 　　　　　　//entry为图片原目录（相册）流
+                    cutImage(entry.toLocalURL());
+                }, function(e) {
+                    console.log("读取图片错误：" + e.message);
+                });
+            }, function(a) {}, {
+                filter: "image"
+            })
+        };
+		
+		function cutImage(path) {
+            mui.openWindow({
+                url: 'PhotographEdit.html',
+                id: 'PhotographEdit',
+                extras: {
+                    path: path,
+                }
+            });
+        }
+		/*版本更新（强制）*/
+//		document.getElementById("alertBtn").addEventListener('tap', function() {
+//			mui.alert('新增功能：分享到朋友圈', '版本更新',"立即更新", function() {
+//			});
+//		});
+		/*版本升级（选择）*/
+//		document.getElementById("confirmBtn").addEventListener('tap', function() {
+//			var btnArray = ['下次再说', '立即下载'];
+//			mui.confirm('新增功能：分享到朋友圈，立即来下载吧！', '版本更新', btnArray, function(e) {
+//				if (e.index == 1) {
+//				} else {
+//				}
+//			})
+//		});
+/*
+		document.getElementById("toastBtn").addEventListener('tap', function() {
+			mui.toast('<span class="mui-icon mui-icon-spinner-cycle mui-spin"></span>加载中');
+//			mui.toast('<span class="mui-icon mui-icon-checkmarkempty" style="font-size: 60px"></span>操作成功');
+//			mui.toast('<span class="mui-icon mui-icon mui-icon-close"></span>操作失败');
+//			mui.toast('<span class="mui-icon mui-icon-refreshempty"></span>网络异常');
+		});
+*/
+	</script>
+</html>

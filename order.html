@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html>
+
+	<head>
+		<meta charset="utf-8">
+		<title></title>
+		<meta name="viewport" content="width=device-width, initial-scale=1,maximum-scale=1,user-scalable=no">
+		<meta name="apple-mobile-web-app-capable" content="yes">
+		<meta name="apple-mobile-web-app-status-bar-style" content="black">
+		<!--标准mui.css-->
+		<link rel="stylesheet" href="../css/mui.min.css">
+		<link rel="stylesheet" href="../css/app.min.css">
+		<!--App自定义的css-->
+		<link rel="stylesheet" href="../css/bass.css">
+	</head>
+	<body class="orderMain">
+		<!--顶部标题栏 开始-->
+		<header class="mui-bar mui-bar-nav">
+			<a class="mui-action-back mui-icon mui-icon-left-nav mui-pull-left"></a>
+			<h1 class="mui-title">我的订单</h1>
+		</header>
+		<!--顶部标题栏 线束-->
+		<!--中间内容区 开始-->
+		<div class="mui-content">
+			<div style="padding: 10px 10px;">
+				<div id="segmentedControl" class="mui-segmented-control">
+					<a class="mui-control-item mui-active" href="#item1">已下单</a>
+					<a class="mui-control-item" href="#item2">已支付</a>
+					<a class="mui-control-item" href="#item3">已发货</a>
+					<a class="mui-control-item" href="#item4">已完成</a>
+				</div>
+			</div>
+			<div>
+				<div id="item1" class="mui-control-content mui-active">
+					<div class="mui-scroll-wrapper scroll">
+						<div class="mui-scroll">
+							<ul class="mui-table-view">
+								
+							</ul>
+						</div>
+					</div>
+				</div>
+				<div id="item2" class="mui-control-content">
+					<div class="mui-scroll-wrapper scroll">
+						<div class="mui-scroll">
+							<ul class="mui-table-view">
+								
+							</ul>
+						</div>
+					</div>
+				</div>
+				<div id="item3" class="mui-control-content">
+					<div class="mui-scroll-wrapper scroll">
+						<div class="mui-scroll">
+							<ul class="mui-table-view">
+								
+							</ul>
+						</div>
+					</div>
+				</div>
+				<div id="item4" class="mui-control-content">
+					<div class="mui-scroll-wrapper scroll">
+						<div class="mui-scroll">
+							<ul class="mui-table-view">
+								
+							</ul>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+		<!--中间内容区 结束-->
+	</body>
+	<script src="../js/jquery-1.7.2.min.js"></script>
+	<script src="../js/mui.min.js"></script>
+	<script src="../js/app.min.js"></script>
+	<script src="../js/master.js"></script>
+	<script src="../js/date.js"></script>
+	<script src="../js/ext.js"></script>
+	<script>
+		mui.plusReady(function () {
+			
+			jQuery(function () {
+				var allH= jQuery(window).height();
+				jQuery(".mui-control-content").css("height",allH-104);
+			});
+			(function($) {
+				//tab切换中显示滚动条，顶部固定
+				$('.scroll').scroll({
+					indicators: true //是否显示滚动条
+				});
+			})(mui);
+			
+			$(".mui-control-item").bind("tap", function () {
+				if ($(this).attr("loaded")) {
+					return ;
+				}
+				
+				loadData($(this).index());
+			});
+			
+			
+			loadData(0);
+		});
+		
+		
+		var loadData = function (type) {
+			
+			var mode = "NEW";
+			if (type == 1) {
+				mode = "PAYED";
+			} else if (type == 2) {
+				mode = "DELIVERY";
+			} else if (type == 3) {
+				mode = "CLOSED";
+			}
+			
+			/*
+			<li class="mui-table-view-cell mui-media">
+				<div href="javascript:;" class="mui-slider-handle">
+					<img class="mui-media-object mui-pull-left" src="../images/images02.jpg">
+					<div class="mui-media-body">
+						<h4 class="mui-ellipsis">商品名称：阿根廷鱿鱼</h4>
+						<p class="mui-ellipsis">货源地：广东省舟山市</p>
+						<p class="mui-ellipsis" style="color: red">成交数量：100吨</p>
+						<p class="mui-ellipsis" style="color: red">成交价格：12000元/吨</p>
+						<p class='mui-ellipsis'>成交时间：2017-07-01</p>
+					</div>
+				</div>
+			</li>
+			*/
+			async("GET", "/order/my-orders?orderStatus=" + mode, {}, function (res) {
+				var ul = $(".mui-control-content").eq(type).find("ul");
+				$(".mui-control-item").eq(type).attr("loaded", "loaded");
+				ul.empty();
+				if (res.data && res.data.length > 0) {
+					for (var i = 0; i < res.data.length; i++) {
+						var item = res.data[i];
+						var li = $("<li>");
+						li.addClass("mui-table-view-cell mui-media");
+						ul.append(li);
+						
+						var div = $("<div>");
+						div.addClass("mui-slider-handle");
+						div.attr("data-href", "orderDetail.html?oid=" + item.id);
+						div.bind("tap", linkForward);
+						li.append(div);
+						
+						var img = $("<img>");
+						img.addClass("mui-media-object mui-pull-left");
+						if (item.goodsImgUrl && item.goodsImgUrl.length > 0) {
+							img.attr("src", item.goodsImgUrl[0]);
+						} else {
+							img.attr("src", "../images/noimg.jpg");
+						}
+						div.append(img);
+						
+						var body = $("<div>");
+						body.addClass("mui-media-body");
+						div.append(body);
+						
+						var name = $("<h4>");
+						name.addClass("mui-ellipsis");
+						name.text("商品名称：" + item.orderCommodity.name);
+						body.append(name);
+						
+						var addr = $("<p>");
+						addr.addClass("mui-ellipsis");
+						addr.text("货源地：" + item.orderCommodity.source);
+						body.append(addr);
+						
+						var num = $("<p>");
+						num.addClass("mui-ellipsis");
+						num.css("color", "red");
+						num.text("成交数量：" + item.orderCommodity.amount + "吨");
+						body.append(num);
+						
+						var price = $("<p>");
+						price.addClass("mui-ellipsis");
+						price.css("color", "red");
+						price.text("成交价格：" + item.orderCommodity.unitPrice + "元/吨");
+						body.append(price);
+						
+						var time = $("<p>");
+						time.addClass("mui-ellipsis");
+						time.text("成交时间：" + item.createTime.substring(0, 10));
+						body.append(time);
+						
+					}
+				}
+				
+			});
+		}
+	</script>
+</html>

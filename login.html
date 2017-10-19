@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html class="ui-page-login">
+
+	<head>
+		<meta charset="utf-8">
+		<title></title>
+		<meta name="viewport" content="width=device-width, initial-scale=1,maximum-scale=1,user-scalable=no">
+		<meta name="apple-mobile-web-app-capable" content="yes">
+		<meta name="apple-mobile-web-app-status-bar-style" content="black">
+		<!--标准mui.css-->
+		<link rel="stylesheet" href="../css/mui.min.css">
+		<link rel="stylesheet" href="../css/app.min.css">
+		<link rel="stylesheet" href="../css/icons-extra.css">
+		<!--App自定义的css-->
+		<link rel="stylesheet" href="../css/bass.css">
+	</head>
+
+	<body class="loginMain">
+		<header class="mui-bar mui-bar-nav">
+			<h1 class="mui-title">登录</h1>
+		</header>
+		<div class="mui-content">
+			<div class="logo"><img src="../images/logo.png" alt=""></div>
+			<h1 class="mui-text-center">找货宝</h1>
+			
+			
+			<form id='login-form' class="mui-input-group">
+				<div class="mui-input-row">
+					<input id='account' type="text" class="mui-input-clear mui-input" placeholder="请输入用户名">
+				</div>
+				<div class="mui-input-row">
+					<input id='password' type="password" class="mui-input-clear mui-input" placeholder="请输入密码">
+				</div>
+			</form>
+			
+			
+			<div class="mui-content-padded login-tips" id="login_error" style="visibility: hidden;">
+				<span class="mui-icon mui-icon-close"></span><span id="error_text">不存在该用户</span>
+			</div>
+			<div class="mui-content-padded">
+				<button id='login' class="mui-btn mui-btn-block mui-btn-grey" disabled="disabled">登录</button>
+			</div>
+			<div class="mui-row">
+				<div class="mui-col-xs-6 mui-col-sm-6">
+					<input type="checkbox" name="login_state" id="remember_flag">
+					<label for="login_state"> 记录我的登录状态</label>
+				</div>
+				<div class="mui-col-xs-6 mui-col-sm-6 mui-text-right"><a id='forgetPassword'>忘记密码</a></div>
+			</div>
+			
+			
+			
+		</div>
+		<script src="../js/mui.min.js"></script>
+		<script src="../js/app.min.js"></script>
+		<script src="../js/ext.js"></script>
+		<script type="text/javascript">
+			mui.plusReady(function () {
+				clearAll();
+				document.getElementById("account").addEventListener("keyup", checker);
+				document.getElementById("password").addEventListener("keyup", checker);
+				document.getElementById("login").addEventListener("tap", function () {
+					
+					var a = document.getElementById("account").value.trim();
+					var p = document.getElementById("password").value.trim();
+					var r = document.getElementById("remember_flag").checked ? "Y" : "N";
+					
+					
+					if (a != "" && p != "") {
+						
+						var login_error = document.getElementById("login_error");
+						login_error.style.visibility = "hidden";
+						plus.storage.removeItem("token");
+												
+						async("POST", "/auth/do-auth", {
+							"username" : a,
+							"password" : p,
+							"isRememberMe" : r
+						}, function (res) {
+							plus.storage.setItem("token", res.data);
+							plus.storage.setItem("remember", r);
+							
+							var regId = plus.push.getClientInfo().clientid;
+							
+							if (regId) {
+								async("GET", "/pushService/registerPushService?deviceType=" + (plus.os.ios ? 2 : 1) + "&regId=" + encodeURIComponent(regId), {}, function () {
+									console.log("clientid:" + regId);
+								}, function () {
+									mui.toast("设备注册失败");
+								}, true);
+							}
+							
+							mui.openWindow({
+								url: "main.html",
+								id: "main"
+							});
+						}, function (res) {
+							login_error.style.visibility = "visible";
+							document.getElementById("error_text").innerText = res.msg;
+						});
+					}
+				});
+				document.getElementById("forgetPassword").setAttribute("href", "tel:" + settings.pass_tel);
+			});
+			
+			function checker() {
+				var a = document.getElementById("account").value.trim();
+				var p = document.getElementById("password").value.trim();
+				var login = document.getElementById("login");
+				if (a == "" || p == "") {
+					login.classList.remove("mui-btn-primary");
+					login.classList.add("mui-btn-grey");
+					login.setAttribute("disabled", true);
+				} else {
+					login.classList.add("mui-btn-primary");
+					login.classList.remove("mui-btn-grey");
+					login.removeAttribute("disabled");
+				}
+			}
+		</script>
+	</body>
+</html>

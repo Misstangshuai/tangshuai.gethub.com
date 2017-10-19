@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <title></title>
+    <meta name="viewport" content="width=device-width, initial-scale=1,maximum-scale=1,user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <!--标准mui.css-->
+    <link rel="stylesheet" href="../css/mui.min.css">
+    <!--App自定义的css-->
+    <link rel="stylesheet" href="../css/bass.css">
+    <style>
+    	.mui-ellipsis span, .order_list span {padding:0;}
+    </style>
+</head>
+<body class="goodsEditMain">
+<!--顶部标题栏 开始-->
+<header class="mui-bar mui-bar-nav">
+    <a class="mui-action-back mui-icon mui-icon-left-nav mui-pull-left"></a>
+    <h1 class="mui-title">订单详情</h1>
+</header>
+<!--顶部标题栏 线束-->
+<!--中间内容区 开始-->
+<div class="mui-content" style="margin-bottom: 50px">
+    <div class="progressbar">
+        <ul class="mui-clearfix mui-text-center">
+            <li class="active">
+                <h6></h6>
+                <span class="mui-icon mui-icon-checkmarkempty"></span>
+                <p>下单</p>
+            </li>
+            <li id="mode_1">
+                <h6></h6>
+                <span class="mui-icon mui-icon-checkmarkempty"></span>
+                <p>支付服务费</p>
+            </li>
+            <li id="mode_2">
+                <h6></h6>
+                <span class="mui-icon mui-icon-checkmarkempty"></span>
+                <p>支付货款</p>
+            </li>
+            <li id="mode_3">
+                <h6></h6>
+                <span class="mui-icon mui-icon-checkmarkempty"></span>
+                <p>发货</p>
+            </li>
+            <li id="mode_4">
+                <h6></h6>
+                <span class="mui-icon mui-icon-checkmarkempty"></span>
+                <p>签收</p>
+            </li>
+        </ul>
+    </div>
+    <div class="title">商品信息</div>
+    <ul class="mui-table-view">
+        <li class="mui-table-view-cell mui-media">
+            <div href="javascript:;" class="mui-slider-handle">
+                <img class="mui-media-object mui-pull-left" id="goods_img" src="../images/noimg.jpg" style="line-height: 110px;max-width: 110px;height: 110px;">
+                <div class="mui-media-body">
+                    <h4 class="mui-ellipsis" id="goods_name"></h4>
+                    <p class='mui-ellipsis'>订单编号：<span id="order_no"></span></p>
+                    <p class="mui-ellipsis">商品编号：<span id="goods_no"></span></p>
+                    <p class="mui-ellipsis">货源地：<span id="goods_source"></span></p>
+                    <p class="mui-ellipsis">规格：<span id="goods_spec"></span></p>
+                </div>
+            </div>
+        </li>
+    </ul>
+    <div class="title">订单信息</div>
+    <div class="mui-row order_list">
+        <div class="mui-col-xs-6 mui-col-sm-6">成交时间：<span id="order_time"></span></div>
+        <div class="mui-col-xs-6 mui-col-sm-6">付款类型：<span id="order_pay"></span></div>
+        <div class="mui-col-xs-6 mui-col-sm-6">成交数量：<span id="goods_num"></span>吨</div>
+        <div class="mui-col-xs-6 mui-col-sm-6">成交价格：<span id="goods_price"></span>元/吨</div>
+        <div class="mui-col-xs-6 mui-col-sm-6">订单总价：<span id="order_price"></span>元</div>
+    </div>
+    <div class="title">物流信息</div>
+    <!--
+    <div class="mui-row order_list">
+        <div class="mui-col-xs-6 mui-col-sm-6">物流公司：顺丰物流</div>
+        <div class="mui-col-xs-6 mui-col-sm-6">司机姓名：王老五</div>
+        <div class="mui-col-xs-6 mui-col-sm-6">司机电话：129988718899</div>
+        <div class="mui-col-xs-6 mui-col-sm-6">车牌号：京A21290</div>
+        <div class="mui-col-xs-6 mui-col-sm-6">物流价格：129.88元</div>
+    </div>
+    <h5 style="padding: 0 15px">物流相关照片</h5>
+    <div class="mui-row5 mui-clearfix order_list_img">
+        <div class="mui-col5"><img src="../images/images02.jpg" alt=""></span></div>
+        <div class="mui-col5"><img src="../images/images02.jpg" alt=""></span></div>
+        <div class="mui-col5"><img src="../images/images02.jpg" alt=""></span></div>
+        <div class="mui-col5"><img src="../images/images02.jpg" alt=""></span></div>
+        <div class="mui-col5"><img src="../images/images02.jpg" alt=""></span></div>
+        <div class="mui-col5"><img src="../images/images02.jpg" alt=""></span></div>
+    </div>
+    -->
+    <div class="footer_btn mui-text-center">
+        <a href="#picture" class="mui-btn mui-btn-primary mui-btn-block">分享</a>
+    </div>
+</div>
+<!--中间内容区 结束-->
+<!--分享弹窗 开始-->
+<div id="picture" class="mui-popover mui-popover-action mui-popover-bottom">
+    <ul class="mui-table-view">
+        <li class="mui-table-view mui-row mui-disabled">
+            <a class="mui-col-xs-6 mui-col-sm-6" id="share_t"><span class="mui-icon mui-icon-pengyouquan" style="display: inline-block; width: 100%"></span>分享到朋友圈</a>
+            <a class="mui-col-xs-6 mui-col-sm-6" id="share_f"><span class="mui-icon mui-icon-weixin" style="display: inline-block; width: 100%"></span>分享给好友</a>
+        </li>
+    </ul>
+    <ul class="mui-table-view">
+        <li class="mui-table-view-cell">
+            <a href="#picture"><b>取消</b></a>
+        </li>
+    </ul>
+</div>
+<!--分享弹窗 结束-->
+</body>
+<script src="../js/mui.min.js"></script>
+<script src="../js/master.js"></script>
+<script src="../js/date.js"></script>
+<script src="../js/ext.js"></script>
+<script>
+	var shares = null;
+	var data = null;
+	mui.plusReady(function () {
+        updateSerivces();
+        
+		var self = plus.webview.currentWebview();
+		//self.oid = 846;
+		async("GET", "/order/order-details?orderId=" + self.oid, {}, function (res) {
+			var mode = res.data.mode;
+			var orderType = res.data.orderType;
+			
+			if (mode == 6) {
+				document.getElementById("mode_1").classList.add("active");
+				document.getElementById("mode_2").classList.add("active");
+				document.getElementById("mode_3").classList.add("active");
+				document.getElementById("mode_4").classList.add("active");
+			} else if (mode == 5) {
+				document.getElementById("mode_1").classList.add("active");
+				document.getElementById("mode_2").classList.add("active");
+				document.getElementById("mode_3").classList.add("active");
+			} else if (mode == 4) {
+				document.getElementById("mode_1").classList.add("active");
+				document.getElementById("mode_2").classList.add("active");
+			} else if (orderType == "01") {				
+				document.getElementById("mode_1").classList.add("active");
+			}
+			
+			var goods = res.data.orderCommodity;
+			
+			document.getElementById("goods_name").textContent = goods.name;
+			document.getElementById("order_no").textContent = res.data.orderNo;
+			document.getElementById("goods_no").textContent = goods.commodityId;
+			document.getElementById("goods_source").textContent = goods.source;
+			document.getElementById("goods_spec").textContent = goods.specification;
+			document.getElementById("order_time").textContent = res.data.createTime.substring(0, 10);
+			document.getElementById("order_pay").textContent = res.data.paidType == "2" ? "线上订单" : "线下订单";
+			document.getElementById("goods_num").textContent = goods.amount;
+			document.getElementById("goods_price").textContent = goods.unitPrice;
+			document.getElementById("order_price").textContent = goods.unitPrice * goods.amount;
+			
+			if (res.data.goodsImgUrl && res.data.goodsImgUrl.length > 0) {
+				document.getElementById("goods_img").setAttribute("src", res.data.goodsImgUrl[0] + "!thumb");
+			}
+			
+			data = res.data;
+						
+		});
+		
+		document.getElementById("share_t").addEventListener("tap", function () {
+			shareAction(0);			
+			mui('#picture').popover('hide');
+		});
+		
+		document.getElementById("share_f").addEventListener("tap", function () {
+			shareAction(1);
+			mui('#picture').popover('hide');
+		});
+	});
+	
+	
+	
+    function updateSerivces(){
+        plus.share.getServices(function(s){
+            shares={};
+            for(var i in s){
+                var t = s[i];
+                shares[t.id]=t;
+            }
+        }, function(e){
+            mui.alert("获取分享服务列表失败："+e.message );
+        });
+    }
+    
+    var shortUrl = null;
+    
+    	function shareAction(type) {
+    		if (!data) {
+    			return ;
+    		}
+    		if (shortUrl) {
+    			doShare(type);
+    		} else {
+	    		async("GET", "/index/shortUrl?goodsId=" + data.orderCommodity.commodityId, {}, function (res) {
+	    			shortUrl = res.data.url_short;
+	    			doShare(type);
+	    		});
+    		}
+        }
+    	
+    	function doShare(type) {
+    		
+    		
+    		var wx = shares["weixin"];
+    		var x = "WXSceneTimeline";
+            if (type == 1) {
+            	x = "WXSceneSession";
+            }
+            var msg = {title:data.orderCommodity.name + data.orderCommodity.specification, content:"价格：" + data.orderCommodity.unitPrice + "元/吨，成交量：" + data.orderCommodity.amount + "吨",extra:{scene:x}};
+            msg.href=shortUrl;
+            var pic = document.getElementById("goods_img").getAttribute("src");
+            pic = pic.replace(/[\\]/g, "");
+            /*
+            if (pic.indexOf("http") > -1) {
+            	
+            	var dtask = plus.downloader.createDownload(pic, {filename:"_downloads/" + data.orderCommodity.commodityId + ".jpg"}, function(d, status) {
+            		console.log(d.filename);
+	                if (status == 200) {
+	                    var sd_path = plus.io.convertLocalFileSystemURL(d.filename);
+	                    console.log(sd_path);
+            			msg.thumbs = [sd_path];
+	                } else {
+            			msg.thumbs = [pic];
+	                }
+            	
+		            // 发送分享
+		            if ( wx.authenticated ) {
+		                shareMessage(msg,wx);
+		            } else {
+		                wx.authorize( function(){
+		                    shareMessage(msg, wx);
+		                },function(e){
+		                    mui.alert("认证授权失败："+e.code+" - "+e.message );
+		                    
+		                });
+		            }
+	            });
+	            //启动下载任务
+	            dtask.start();
+            	
+            } else {
+            	*/
+            	msg.thumbs = [pic];
+            	
+            	
+	            // 发送分享
+	            if ( wx.authenticated ) {
+	                shareMessage(msg,wx);
+	            } else {
+	                wx.authorize( function(){
+	                    shareMessage(msg, wx);
+	                },function(e){
+	                    mui.alert("认证授权失败："+e.code+" - "+e.message );
+	                    
+	                });
+	            }
+         //   }
+            
+            
+    	}
+    
+    	function shareMessage(msg, s) {
+            
+            s.send(msg, function(){
+            	mui.toast("分享成功！ " );
+            }, function(e){
+            	//mui.toast( "分享失败: "+JSON.stringify(e) );
+            
+            });
+        }
+</script>
+</html>

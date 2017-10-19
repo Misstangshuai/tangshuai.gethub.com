@@ -1,0 +1,198 @@
+
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <title></title>
+    <meta name="viewport" content="width=device-width, initial-scale=1,maximum-scale=1,user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <!--标准mui.css-->
+    <link rel="stylesheet" href="../css/mui.min.css">
+    <!--App自定义的css-->
+    <link rel="stylesheet" href="../css/bass.css">
+    <link href="../css/cropper.min.css" rel="stylesheet" />
+    <style>
+    	#wm_pic {position: absolute; z-index: 100; top: 45%; left: 30%; }
+    </style>
+</head>
+<body class="">
+<!--顶部标题栏 开始-->
+<header class="mui-bar mui-bar-nav">
+    <a class="mui-action-back mui-icon mui-icon-left-nav mui-pull-left"></a>
+    <h1 class="mui-title">添加水印</h1>
+</header>
+<!--顶部标题栏 线束-->
+<!--中间内容区 开始-->
+<div class="mui-content">
+    <h5 class="mui-text-center" style="position: relative; z-index: 999999; background: #fff; margin:0; padding:5px 0;">请移动水印至最佳位置</h5>
+    <div id="cropper-example-1" class="PhotographEdit" style="position: relative;">
+    	<img id="im" alt="Picture" />
+		<img src="../images/wm.png" alt="" width="40%" id="wm_pic" />
+    </div>
+    <div style="position: fixed; bottom: 20px; right: 20px;">
+        <a id='confirmBtn' class="mui-btn mui-btn-primary mui-btn-outlined" style="color: #fff">确定</a>
+    </div>
+</div>
+<!--中间内容区 结束-->
+</body>
+<script src="../js/jquery-1.7.2.min.js"></script>
+<script src="../js/mui.min.js"></script>
+<script src="../js/exif.js"></script>
+<script src="../js/cropper.min.js"></script>
+<script src="../js/app.min.js"></script>
+<script src="../js/ext.js"></script>
+	
+<script>
+	var backvar = false;
+    
+    
+    (function(c) {
+        var Cro = function() {}
+        c.extend(Cro.prototype, {
+            orientation: null,
+            urldata: null,
+            view: null,
+            num: 0,
+            sbx: null,
+            sby: null,
+            n: 0,
+            onReady: function() {
+                var that = this;
+                
+				mui.init({
+			    	beforeback:function () {
+			    		if (backvar) return true;
+			    		var btnArray = ['继续编辑', '退出编辑'];
+				        mui.confirm('图片还没有保存，返回不会保存图片', '提示信息', btnArray, function(e) {
+				            if (e.index == 0) {
+				            	
+				            } else {
+				            	backvar = true;
+				            	mui.back();
+				            }
+				        });
+				        
+			        	return false;
+			    	}
+			    });
+                
+                that.view = plus.webview.currentWebview();
+
+                $("#im").attr("src", that.view.path);
+                $("#im").width(document.body.clientWidth);
+                $("#cropper-example-1").height(document.body.clientWidth);
+                
+                var opener = plus.webview.currentWebview().opener();
+                if (opener) opener.close();
+           },
+            base64: function() {
+                
+                var img = document.getElementById("im");
+                var wm = document.getElementById("wm_pic");
+                
+                var canvas = document.createElement("canvas");
+                canvas.width = document.body.clientWidth;
+                canvas.height = canvas.width;
+                
+                var ctx = canvas.getContext("2d");
+                ctx.drawImage(img, 0, 0, img.offsetWidth, img.offsetHeight);
+                ctx.drawImage(wm, 0, 0, 300, 70, wm.offsetLeft, wm.offsetTop, wm.offsetWidth, wm.offsetHeight);
+                
+                var dataURL = canvas.toDataURL("image/jpeg", 1.0); 
+                
+                return dataURL;
+            }
+        });
+
+        var cro = new Cro();
+
+        c.plusReady(function() {
+		    jQuery(".PhotographEdit").css("height",jQuery(document).height()-68);
+		    
+            cro.onReady();
+    
+		    document.getElementById("confirmBtn").addEventListener('tap', function() {
+		        var bitmap = new plus.nativeObj.Bitmap();
+		        var ts = new Date().getTime();
+		        var filename = "_doc/" + ts + ".jpg";
+		        bitmap.loadBase64Data(cro.base64(), function() {
+		            bitmap.save(filename, {
+		                overwrite: true,
+		                quality: 10
+		            }, function(i) {
+		            	
+		            	if (plus.webview.currentWebview().src == "goods") {
+		            		plus.webview.getWebviewById("goodsAdd").evalJS('addImage("' + cro.base64() + '")');
+		            	}
+		                plus.gallery.save(filename, function() {
+			                mui.toast("图片已保存至相册");
+			                backvar = true;
+			                mui.back();
+	                    });
+		            }, function(e) {
+		            	mui.toast("图片保存失败");
+		            });
+		        }, function(e) {
+		            mui.toast("图片生成失败");
+		        });
+		    });
+		    
+		    document.getElementById("wm_pic").addEventListener("touchstart", function (e) {
+		    	moving = true;
+		    	
+                e.preventDefault();  
+                mx = e.touches[0].pageX;  
+                my = e.touches[0].pageY; 
+                ex = this.offsetLeft;
+                ey = this.offsetTop;
+                ew = this.offsetWidth;
+                eh = this.offsetHeight;
+		    });
+		    
+		    document.getElementById("wm_pic").addEventListener("touchmove", function (e) {
+                e.preventDefault();  
+		    	if (moving) {
+		    		var x = e.touches[0].pageX;
+		    		var y = e.touches[0].pageY;
+		    		var cx = ex + x - mx;
+		    		var cy = ey + y - my;
+		    		
+		    		if (cx < 0) {
+		    			cx = 0;
+		    		}
+		    		
+		    		if (cy < 0) {
+		    			cy = 0;
+		    		}
+		    		
+		    		if (cx > document.body.clientWidth - ew) {
+		    			cx = document.body.clientWidth - ew;
+		    		}
+		    		
+		    		if (cy > document.body.clientWidth - eh) {
+		    			cy = document.body.clientWidth - eh;
+		    		}
+		    		
+		    		this.style.left = cx + "px";
+		    		this.style.top = cy + "px";
+		    	}
+		    });
+		    
+		    document.body.addEventListener("touchend", function (e) {
+                e.preventDefault();  
+		    	moving = false;
+		    });
+        })
+    })(mui);
+    
+    var moving = false;
+    var mx = 0;
+    var my = 0;
+    var ex = 0;
+    var ey = 0;
+    var ew = 0;
+    var eh = 0;
+</script>
+</html>
